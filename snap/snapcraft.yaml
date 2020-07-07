@@ -1,0 +1,206 @@
+name: dolphin-emulator
+base: core20
+version: '5.0'
+summary: A Wii/GameCube Emulator
+description: |
+  Dolphin is an emulator for two recent Nintendo video game consoles: the GameCube and the Wii. 
+  It allows PC gamers to enjoy games for these two consoles in full HD (1080p) with 
+  several enhancements: compatibility with all PC controllers, turbo speed, networked multiplayer, and even more.
+license: GPL-2.0
+icon: snap/gui/dolphin-emu.png
+grade: stable
+confinement: strict
+architectures:
+  - build-on: amd64
+parts:
+  dolphin-emu:
+    plugin: cmake
+    source: https://github.com/dolphin-emu/dolphin.git
+    # source: https://github.com/Nightmayr/dolphin.git
+    source-commit: 9c12a843f86d39bc64d9e9b5b670e67455487739
+    # source-tag: $SNAPCRAFT_PROJECT_VERSION
+    # cmake-parameters: [-DCMAKE_BUILD_TYPE=Release, -DENABLE_FFMPEG_AUDIO_DECODER=ON]
+    build-packages:
+      - ffmpeg 
+      - libavcodec-dev
+      - libevdev-dev
+      - libusb-1.0-0-dev
+      - libavformat-dev
+      - libswscale-dev
+      - libsfml-dev
+      - libminiupnpc-dev
+      - libmbedtls-dev
+      - libhidapi-dev
+      - libpangocairo-1.0-0
+      - libgtk2.0-dev
+      - libbluetooth-dev
+      - qt5-default
+      - qtbase5-private-dev
+      - qtbase5-dev
+      - libudev-dev
+    stage-packages:
+      - libusb-1.0-0-dev
+      - ffmpeg
+      - libhidapi-dev
+      - libsfml-dev
+      - libmbedtls-dev
+      - libminiupnpc-dev
+      - libavformat-dev
+      - libbluetooth-dev
+      - freeglut3
+      - libglu1
+      # - qtwayland5
+      # - libpulse0
+      # - qtmultimedia5-dev
+      # - libqt5multimedia5-plugins
+    # override-pull: |
+    #   snapcraftctl pull
+    #   git checkout -b pr-6783
+    #   git config --global user.email "patcher@patch.com"
+    #   git config --global user.name "Patcher"
+    #   curl -sL https://github.com/dolphin-emu/dolphin/pull/6783.patch | git apply --reject --whitespace=fix
+    #   git checkout -b $SNAPCRAFT_PROJECT_VERSION
+    #   git merge pr-6783
+    # override-build: |
+    #   mkdir Build && cd Build
+    #   export DESTDIR=$SNAPCRAFT_PART_INSTALL
+    #   cmake ..
+    #   make -j$SNAPCRAFT_BUILD_ENVIRONMENT_CPU
+    #   make install
+    # stage-packages:
+    #   - qtwayland5
+    #   - libsdl2-dev
+    #   - qtbase5-dev
+    #   - libqt5opengl5-dev
+    #   - qtmultimedia5-dev
+    #   - libpulse0
+    #   - libqt5multimedia5-plugins
+    override-build: |
+      # git apply $SNAPCRAFT_STAGE/shared-memory.patch
+      cat $SNAPCRAFT_PART_BUILD/Source/Core/Common/MemArena.cpp
+      snapcraftctl build
+      sed -i 's|Icon=dolphin-emu|Icon=/usr/local/share/icons/hicolor/scalable/apps/dolphin-emu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
+    # after:
+    #   - shared-memory-patch
+  desktop-qt5:
+    build-packages:
+      - build-essential
+      - qtbase5-dev
+      - dpkg-dev
+    make-parameters:
+      - FLAVOR=qt5
+    plugin: make
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: qt
+    stage-packages:
+      - libxkbcommon0
+      - ttf-ubuntu-font-family
+      - dmz-cursor-theme
+      - light-themes
+      - adwaita-icon-theme
+      - gnome-themes-standard
+      - shared-mime-info
+      - libqt5gui5
+      - libgdk-pixbuf2.0-0
+      - libqt5svg5
+      - try:
+          - appmenu-qt5
+      - locales-all
+      - xdg-user-dirs
+      - libgtk2.0-0
+      - qt5-gtk-platformtheme
+    override-prime: |
+      snapcraftctl prime
+      sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
+      sed -i 's|XDG_CONFIG_HOME=$SNAP_USER_DATA|XDG_CONFIG_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
+  plasma-integration:
+    plugin: nil
+    stage-packages:
+      - breeze-icon-theme
+      - kde-style-breeze
+      - plasma-integration
+  # shared-memory-patch:
+  #   plugin: dump
+  #   source: snap/local/patches
+  #   source-type: local
+  #   prime:
+  #     - -*
+  # snapcraft-preload:
+  #   source: https://github.com/sergiusens/snapcraft-preload.git
+  #   plugin: cmake
+  #   build-packages:
+  #     - on amd64:
+  #       - gcc-multilib
+  #       - g++-multilib
+
+plugs:
+  gtk-3-themes:
+    interface: content
+    target: $SNAP/data-dir/themes
+    default-provider: gtk-common-themes
+  gtk-2-themes:
+    interface: content
+    target: $SNAP/data-dir/themes
+    default-provider: gtk-common-themes:gtk-2-themes
+  icon-themes:
+    interface: content
+    target: $SNAP/data-dir/icons
+    default-provider: gtk-common-themes
+  sound-themes:
+    interface: content
+    target: $SNAP/data-dir/sounds
+    default-provider: gtk-common-themes
+apps:
+  dolphin-emu:
+    # command: bin/desktop-launch $SNAP/usr/local/bin/snapcraft-preload $SNAP/usr/local/bin/dolphin-emu
+    command: bin/desktop-launch $SNAP/usr/local/bin/dolphin-emu
+    desktop: usr/local/share/applications/dolphin-emu.desktop
+    environment:
+      HOME: "$SNAP_USER_COMMON"
+      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
+      KDE_FORK_SLAVES: 1
+      DISABLE_WAYLAND: 1
+      # KF5_LIBEXEC_DIR: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5"
+      PATH: "$PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5" # Allows kioslave5 to be found, above commented env variable doesn't work for some reason  
+    plugs:
+      - desktop
+      - desktop-legacy
+      - x11
+      - wayland
+      - pulseaudio
+      - opengl
+      - joystick
+      - unity7
+      - network
+      - network-bind
+      - home
+      # - alsa
+      - removable-media
+      - gsettings
+      - hardware-observe
+      - mount-observe
+      # - bluetooth-control
+      # - bluez
+  dolphin-emu-nogui:
+    command: usr/local/bin/dolphin-emu-nogui
+    environment:
+      HOME: "$SNAP_USER_COMMON"
+      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
+      DISABLE_WAYLAND: 1
+    plugs:
+      - desktop
+      - desktop-legacy
+      - x11
+      - wayland
+      - pulseaudio
+      - opengl
+      - joystick
+      - unity7
+      - network
+      - home
+      - removable-media
+      - gsettings
+      - hardware-observe
+      - mount-observe
+
+
