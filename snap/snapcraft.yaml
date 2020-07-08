@@ -16,10 +16,7 @@ parts:
   dolphin-emu:
     plugin: cmake
     source: https://github.com/dolphin-emu/dolphin.git
-    # source: https://github.com/Nightmayr/dolphin.git
     source-commit: 9c12a843f86d39bc64d9e9b5b670e67455487739
-    # source-tag: $SNAPCRAFT_PROJECT_VERSION
-    # cmake-parameters: [-DCMAKE_BUILD_TYPE=Release, -DENABLE_FFMPEG_AUDIO_DECODER=ON]
     build-packages:
       - ffmpeg 
       - libavcodec-dev
@@ -41,6 +38,7 @@ parts:
     stage-packages:
       - libusb-1.0-0-dev
       - ffmpeg
+      - libavcodec-dev
       - libhidapi-dev
       - libsfml-dev
       - libmbedtls-dev
@@ -50,6 +48,16 @@ parts:
       - freeglut3
       - libglu1
       - libpulse0
+      # Are all the below needed?
+      - libgtk2.0-dev
+      - libpulse-dev
+      - libgl1-mesa-dev
+      - libswscale-dev
+      - libwxbase3.0-dev
+      - libwxgtk3.0-gtk3-dev
+      - libpangocairo-1.0-0
+      - libudev-dev
+
       # - qtwayland5
       # - qtmultimedia5-dev
       # - libqt5multimedia5-plugins
@@ -78,13 +86,13 @@ parts:
     override-pull: |
       snapcraftctl pull
       git apply $SNAPCRAFT_STAGE/shared-memory.patch
+      git apply $SNAPCRAFT_STAGE/nodirtyversion.patch
     override-build: |
-      # git apply $SNAPCRAFT_STAGE/shared-memory.patch
       cat $SNAPCRAFT_PART_BUILD/Source/Core/Common/MemArena.cpp
       snapcraftctl build
       sed -i 's|Icon=dolphin-emu|Icon=/usr/local/share/icons/hicolor/scalable/apps/dolphin-emu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
     after:
-      - shared-memory-patch
+      - patches
   desktop-qt5:
     build-packages:
       - build-essential
@@ -112,6 +120,10 @@ parts:
       - xdg-user-dirs
       - libgtk2.0-0
       - qt5-gtk-platformtheme
+      # Are all the below needed?
+      - libqt5multimedia5-plugins
+      - qtmultimedia5-dev
+      - qtwayland5
     override-prime: |
       snapcraftctl prime
       sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
@@ -122,19 +134,12 @@ parts:
       - breeze-icon-theme
       - kde-style-breeze
       - plasma-integration
-  shared-memory-patch:
+  patches:
     plugin: dump
     source: snap/local/patches
     source-type: local
     prime:
       - -*
-  # snapcraft-preload:
-  #   source: https://github.com/sergiusens/snapcraft-preload.git
-  #   plugin: cmake
-  #   build-packages:
-  #     - on amd64:
-  #       - gcc-multilib
-  #       - g++-multilib
 
 plugs:
   gtk-3-themes:
@@ -153,9 +158,9 @@ plugs:
     interface: content
     target: $SNAP/data-dir/sounds
     default-provider: gtk-common-themes
+
 apps:
   dolphin-emu:
-    # command: bin/desktop-launch $SNAP/usr/local/bin/snapcraft-preload $SNAP/usr/local/bin/dolphin-emu
     command: bin/desktop-launch $SNAP/usr/local/bin/dolphin-emu
     desktop: usr/local/share/applications/dolphin-emu.desktop
     environment:
