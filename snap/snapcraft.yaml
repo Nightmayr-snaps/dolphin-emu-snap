@@ -57,38 +57,11 @@ parts:
       - libwxgtk3.0-gtk3-dev
       - libpangocairo-1.0-0
       - libudev-dev
-
-      # - qtwayland5
-      # - qtmultimedia5-dev
-      # - libqt5multimedia5-plugins
-    # override-pull: |
-    #   snapcraftctl pull
-    #   git checkout -b pr-6783
-    #   git config --global user.email "patcher@patch.com"
-    #   git config --global user.name "Patcher"
-    #   curl -sL https://github.com/dolphin-emu/dolphin/pull/6783.patch | git apply --reject --whitespace=fix
-    #   git checkout -b $SNAPCRAFT_PROJECT_VERSION
-    #   git merge pr-6783
-    # override-build: |
-    #   mkdir Build && cd Build
-    #   export DESTDIR=$SNAPCRAFT_PART_INSTALL
-    #   cmake ..
-    #   make -j$SNAPCRAFT_BUILD_ENVIRONMENT_CPU
-    #   make install
-    # stage-packages:
-    #   - qtwayland5
-    #   - libsdl2-dev
-    #   - qtbase5-dev
-    #   - libqt5opengl5-dev
-    #   - qtmultimedia5-dev
-    #   - libpulse0
-    #   - libqt5multimedia5-plugins
     override-pull: |
       snapcraftctl pull
       git apply $SNAPCRAFT_STAGE/shared-memory.patch
       git apply $SNAPCRAFT_STAGE/nodirtyversion.patch
     override-build: |
-      cat $SNAPCRAFT_PART_BUILD/Source/Core/Common/MemArena.cpp
       snapcraftctl build
       sed -i 's|Icon=dolphin-emu|Icon=/usr/local/share/icons/hicolor/scalable/apps/dolphin-emu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
     after:
@@ -182,12 +155,11 @@ apps:
       - network
       - network-bind
       - home
-      # - alsa
       - removable-media
       - gsettings
       - hardware-observe
       - mount-observe
-      # - bluetooth-control
+      - bluetooth-control
       # - bluez
   dolphin-emu-nogui:
     command: usr/local/bin/dolphin-emu-nogui
