@@ -1,0 +1,54 @@
+From 823fdda30c38be953c3d425874f2adeabed2b5a8 Mon Sep 17 00:00:00 2001
+From: booto <remornicus@gmail.com>
+Date: Tue, 8 May 2018 08:42:38 +0800
+Subject: [PATCH] intrinsics: stop defining _xgetbv/_XCR_XFEATURE_ENABLED_MASK,
+ which are reserved
+
+---
+ Source/Core/Common/x64CPUDetect.cpp | 21 ++++++++++++++++-----
+ 1 file changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/Source/Core/Common/x64CPUDetect.cpp b/Source/Core/Common/x64CPUDetect.cpp
+index 74d22b3e32a..b66ea45cfac 100644
+--- a/Source/Core/Common/x64CPUDetect.cpp
++++ b/Source/Core/Common/x64CPUDetect.cpp
+@@ -37,15 +37,26 @@ static inline void __cpuid(int info[4], int function_id)
+   return __cpuidex(info, function_id, 0);
+ }
+ 
+-#define _XCR_XFEATURE_ENABLED_MASK 0
+-static u64 _xgetbv(u32 index)
++#endif  // ifndef _WIN32
++
++#ifdef _WIN32
++
++static u64 xgetbv(u32 index)
++{
++  return _xgetbv(index);
++}
++constexpr u32 XCR_XFEATURE_ENABLED_MASK = _XCR_XFEATURE_ENABLED_MASK;
++
++#else
++
++static u64 xgetbv(u32 index)
+ {
+   u32 eax, edx;
+   __asm__ __volatile__("xgetbv" : "=a"(eax), "=d"(edx) : "c"(index));
+   return ((u64)edx << 32) | eax;
+ }
+-
+-#endif  // ifndef _WIN32
++constexpr u32 XCR_XFEATURE_ENABLED_MASK = 0;
++#endif  // ifdef _WIN32
+ 
+ CPUInfo cpu_info;
+ 
+@@ -139,7 +150,7 @@ void CPUInfo::Detect()
+     //  - XGETBV result has the XCR bit set.
+     if (((cpu_id[2] >> 28) & 1) && ((cpu_id[2] >> 27) & 1))
+     {
+-      if ((_xgetbv(_XCR_XFEATURE_ENABLED_MASK) & 0x6) == 0x6)
++      if ((xgetbv(XCR_XFEATURE_ENABLED_MASK) & 0x6) == 0x6)
+       {
+         bAVX = true;
+         if ((cpu_id[2] >> 12) & 1)

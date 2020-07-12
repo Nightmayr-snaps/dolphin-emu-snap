@@ -49,6 +49,8 @@ parts:
       - libglu1
       - libpulse0
       # Are all the below needed?
+      - libxcb-xinerama0
+      - libxinerama1
       - libgtk2.0-dev
       - libpulse-dev
       - libgl1-mesa-dev
@@ -57,10 +59,22 @@ parts:
       - libwxgtk3.0-gtk3-dev
       - libpangocairo-1.0-0
       - libudev-dev
+      # Additions from yuzu yaml
+      - libcanberra-gtk-module
+      - libvulkan-dev
+      - mesa-vulkan-drivers
+      - nvidia-driver-440 # seems to fix nvidia vulkan at the cost of adding 100MB+ to final package, may be able to cleanup unecessary files?
+      - vulkan-utils
+      # Fromm ppa dependencies
+      - libqt5widgets5
+      - libqt5core5a
+      - libqt5network5
+      - libbluray2
     override-pull: |
       snapcraftctl pull
       git apply $SNAPCRAFT_STAGE/shared-memory.patch
       git apply $SNAPCRAFT_STAGE/nodirtyversion.patch
+      git apply $SNAPCRAFT_STAGE/forcexdg.patch
     override-build: |
       snapcraftctl build
       sed -i 's|Icon=dolphin-emu|Icon=/usr/local/share/icons/hicolor/scalable/apps/dolphin-emu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
@@ -94,7 +108,7 @@ parts:
       - libgtk2.0-0
       - qt5-gtk-platformtheme
       # Are all the below needed?
-      - libqt5multimedia5-plugins
+      # - libqt5multimedia5-plugins
       - qtmultimedia5-dev
       - qtwayland5
     override-prime: |
@@ -131,6 +145,16 @@ plugs:
     interface: content
     target: $SNAP/data-dir/sounds
     default-provider: gtk-common-themes
+
+layout:
+  /usr/share/vulkan:
+    symlink: $SNAP/usr/share/vulkan
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_intel.so:
+    symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_intel.so
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so:
+    symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libGLX_nvidia.so.0:
+    symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libGLX_nvidia.so.0
 
 apps:
   dolphin-emu:
