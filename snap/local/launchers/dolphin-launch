@@ -1,0 +1,12 @@
+#!/bin/bash
+if [ ! -z "$KDE_FULL_SESSION" ]; then
+  unset KDE_FULL_SESSION
+fi
+
+if echo "$XDG_CURRENT_DESKTOP" | grep -q KDE; then
+  unset XDG_CURRENT_DESKTOP
+else
+  export QT_QPA_PLATFORMTHEME=gtk3
+fi
+
+exec "${@}"

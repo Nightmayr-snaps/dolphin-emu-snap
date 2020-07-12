@@ -1,6 +1,6 @@
 name: dolphin-emulator
-base: core20
-version: '5.0'
+base: core18
+version: '5.0-core18'
 summary: A Wii/GameCube Emulator
 description: |
   Dolphin is an emulator for two recent Nintendo video game consoles: the GameCube and the Wii. 
@@ -15,8 +15,13 @@ architectures:
 parts:
   dolphin-emu:
     plugin: cmake
+    configflags:
+    - "-DCMAKE_INSTALL_PREFIX=/usr/local"
     source: https://github.com/dolphin-emu/dolphin.git
     source-commit: 9c12a843f86d39bc64d9e9b5b670e67455487739
+    build-snaps:
+      - kde-frameworks-5-core18-sdk
+      # - kde-frameworks-5-core18
     build-packages:
       - ffmpeg 
       - libavcodec-dev
@@ -31,9 +36,9 @@ parts:
       - libpangocairo-1.0-0
       - libgtk2.0-dev
       - libbluetooth-dev
-      - qt5-default
-      - qtbase5-private-dev
-      - qtbase5-dev
+      # - qt5-default
+      # - qtbase5-private-dev
+      # - qtbase5-dev
       - libudev-dev
     stage-packages:
       - libusb-1.0-0-dev
@@ -48,6 +53,7 @@ parts:
       - freeglut3
       - libglu1
       - libpulse0
+      - libslang2
       # Are all the below needed?
       - libxcb-xinerama0
       - libxinerama1
@@ -55,8 +61,8 @@ parts:
       - libpulse-dev
       - libgl1-mesa-dev
       - libswscale-dev
-      - libwxbase3.0-dev
-      - libwxgtk3.0-gtk3-dev
+      # - libwxbase3.0-dev
+      # - libwxgtk3.0-gtk3-dev
       - libpangocairo-1.0-0
       - libudev-dev
       # Additions from yuzu yaml
@@ -70,6 +76,7 @@ parts:
       - libqt5core5a
       - libqt5network5
       - libbluray2
+      - qt5-gtk-platformtheme
     override-pull: |
       snapcraftctl pull
       git apply $SNAPCRAFT_STAGE/shared-memory.patch
@@ -80,53 +87,87 @@ parts:
       sed -i 's|Icon=dolphin-emu|Icon=/usr/local/share/icons/hicolor/scalable/apps/dolphin-emu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
     after:
       - patches
-  desktop-qt5:
-    build-packages:
-      - build-essential
-      - qtbase5-dev
-      - dpkg-dev
-    make-parameters:
-      - FLAVOR=qt5
-    plugin: make
-    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-    source-subdir: qt
-    stage-packages:
-      - libxkbcommon0
-      - ttf-ubuntu-font-family
-      - dmz-cursor-theme
-      - light-themes
-      - adwaita-icon-theme
-      - gnome-themes-standard
-      - shared-mime-info
-      - libqt5gui5
-      - libgdk-pixbuf2.0-0
-      - libqt5svg5
-      - try:
-          - appmenu-qt5
-      - locales-all
-      - xdg-user-dirs
-      - libgtk2.0-0
-      - qt5-gtk-platformtheme
-      # Are all the below needed?
-      # - libqt5multimedia5-plugins
-      - qtmultimedia5-dev
-      - qtwayland5
-    override-prime: |
-      snapcraftctl prime
-      sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
-      sed -i 's|XDG_CONFIG_HOME=$SNAP_USER_DATA|XDG_CONFIG_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
+  # desktop-qt5:
+  #   build-packages:
+  #     - build-essential
+  #     - qtbase5-dev
+  #     - dpkg-dev
+  #   make-parameters:
+  #     - FLAVOR=qt5
+  #   plugin: make
+  #   source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+  #   source-subdir: qt
+  #   stage-packages:
+  #     - libxkbcommon0
+  #     - ttf-ubuntu-font-family
+  #     - dmz-cursor-theme
+  #     - light-themes
+  #     - adwaita-icon-theme
+  #     - gnome-themes-standard
+  #     - shared-mime-info
+  #     - libqt5gui5
+  #     - libgdk-pixbuf2.0-0
+  #     - libqt5svg5
+  #     - try:
+  #         - appmenu-qt5
+  #     - locales-all
+  #     - xdg-user-dirs
+  #     - libgtk2.0-0
+  #     - qt5-gtk-platformtheme
+  #     # Are all the below needed?
+  #     # - libqt5multimedia5-plugins
+  #     - qtmultimedia5-dev
+  #     - qtwayland5
+  #   override-prime: |
+  #     snapcraftctl prime
+  #     sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
+  #     sed -i 's|XDG_CONFIG_HOME=$SNAP_USER_DATA|XDG_CONFIG_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
+
   plasma-integration:
     plugin: nil
     stage-packages:
       - breeze-icon-theme
       - kde-style-breeze
       - plasma-integration
+      - libgpm2
+  launchers:
+    plugin: dump
+    source: snap/local/launchers
+    source-type: local
+    organize:
+      '*': bin/
   patches:
     plugin: dump
     source: snap/local/patches
     source-type: local
     prime:
       - -*
+
+  # This part removes all the files in this snap which already exist in
+  # connected content and base snaps. Since these files will be available
+  # at runtime from the content and base snaps, they do not need to be
+  # included in this snap itself.
+  #
+  # More info: https://snapcraft-utils-library.readthedocs.io/en/latest/lib/cleanup.html 
+  #
+  cleanup:
+    after:  # Make this part run last; list all your other parts here
+      - dolphin-emu
+      - patches
+      - plasma-integration
+      - launchers
+      # - desktop-qt5
+    plugin: nil
+    build-snaps:  # List all content-snaps and base snaps you're using here
+      - core18
+      - kde-frameworks-5-core18
+      # - kde-frameworks-5-core18-sdk
+    override-prime: |
+      set -eux
+      # for snap in "core18" "kde-frameworks-5-core18" "kde-frameworks-5-core18-sdk"; do  # List all content-snaps and base snaps you're using here
+      for snap in "core18" "kde-frameworks-5-core18"; do  # List all content-snaps and base snaps you're using here
+        cd "/snap/$snap/current" && find . -type f,l -exec rm -f "$SNAPCRAFT_PRIME/{}" \;
+      done
 
 plugs:
   gtk-3-themes:
@@ -158,7 +199,14 @@ layout:
 
 apps:
   dolphin-emu:
-    command: bin/desktop-launch $SNAP/usr/local/bin/dolphin-emu
+    extensions:
+      - kde-neon
+      # - gnome-3-34
+    command: usr/local/bin/dolphin-emu
+    command-chain:
+      # - bin/desktop-launch
+      - bin/dolphin-launch
+    # command: usr/local/bin/dolphin-emu
     desktop: usr/local/share/applications/dolphin-emu.desktop
     environment:
       HOME: "$SNAP_USER_COMMON"
