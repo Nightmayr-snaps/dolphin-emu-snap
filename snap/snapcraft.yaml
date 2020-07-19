@@ -177,10 +177,6 @@ plugs:
     interface: content
     target: $SNAP/data-dir/themes
     default-provider: gtk-common-themes
-  gtk-2-themes:
-    interface: content
-    target: $SNAP/data-dir/themes
-    default-provider: gtk-common-themes:gtk-2-themes
   icon-themes:
     interface: content
     target: $SNAP/data-dir/icons
