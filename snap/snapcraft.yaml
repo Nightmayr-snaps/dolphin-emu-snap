@@ -16,7 +16,10 @@ parts:
   dolphin-emu:
     plugin: cmake
     configflags:
+    - "-DCMAKE_BUILD_TYPE=Release"
     - "-DCMAKE_INSTALL_PREFIX=/usr/local"
+    - "-DLINUX_LOCAL_DEV=TRUE"
+    - "-DENABLE_SDL=ON"
     source: https://github.com/dolphin-emu/dolphin.git
     source-commit: 9c12a843f86d39bc64d9e9b5b670e67455487739
     build-snaps:
@@ -86,6 +89,9 @@ parts:
       snapcraftctl build
       sed -i 's|Icon=dolphin-emu|Icon=/usr/local/share/icons/hicolor/scalable/apps/dolphin-emu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
       sed -i 's|Exec=env QT_QPA_PLATFORM=xcb dolphin-emu|Exec=dolphin-emu|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
+    organize: 
+        #Copy Sys folder to the Binaries folder
+        usr/local/share/dolphin-emu/sys: usr/local/bin/Sys
     after:
       - patches
   desktop-qt5:
@@ -106,20 +112,20 @@ parts:
       - adwaita-icon-theme
       - gnome-themes-standard
       - shared-mime-info
-    #   - libqt5gui5
+      - libqt5gui5
       - libgdk-pixbuf2.0-0
-    #   - libqt5svg5
-    #   - try:
-    #       - appmenu-qt5
-    #   - locales-all
+      - libqt5svg5
+      - try:
+          - appmenu-qt5
+      - locales-all
       # - xdg-user-dirs
       - libgtk2.0-0
       - xdg-utils
-    #   - qt5-gtk-platformtheme
+      - qt5-gtk-platformtheme
     #   # Are all the below needed?
     #   # - libqt5multimedia5-plugins
     #   - qtmultimedia5-dev
-    #   - qtwayland5
+      - qtwayland5
     override-prime: |
       snapcraftctl prime
       sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
