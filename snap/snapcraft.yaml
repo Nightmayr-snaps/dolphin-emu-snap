@@ -23,7 +23,7 @@ parts:
     source: https://github.com/dolphin-emu/dolphin.git
     source-commit: 9c12a843f86d39bc64d9e9b5b670e67455487739
     build-snaps:
-      - kde-frameworks-5-core18-sdk
+      - kde-frameworks-5-qt-5-14-core18-sdk
       # - kde-frameworks-5-core18
     build-packages:
       - ffmpeg 
@@ -94,43 +94,43 @@ parts:
         usr/local/share/dolphin-emu/sys: usr/local/bin/Sys
     after:
       - patches
-  desktop-qt5:
-    build-packages:
-      - build-essential
-      - qtbase5-dev
-      - dpkg-dev
-    make-parameters:
-      - FLAVOR=qt5
-    plugin: make
-    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-    source-subdir: qt
-    stage-packages:
-      - libxkbcommon0
-      - ttf-ubuntu-font-family
-      - dmz-cursor-theme
-      - light-themes
-      - adwaita-icon-theme
-      - gnome-themes-standard
-      - shared-mime-info
-      - libqt5gui5
-      - libgdk-pixbuf2.0-0
-      - libqt5svg5
-      - try:
-          - appmenu-qt5
-      - locales-all
-      # - xdg-user-dirs
-      - libgtk2.0-0
-      - xdg-utils
-      - qt5-gtk-platformtheme
-    #   # Are all the below needed?
-    #   # - libqt5multimedia5-plugins
-    #   - qtmultimedia5-dev
-      - qtwayland5
-    override-prime: |
-      snapcraftctl prime
-      sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
-      sed -i 's|XDG_CONFIG_HOME=$SNAP_USER_DATA|XDG_CONFIG_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
-      sed -i '2iset -x' $SNAPCRAFT_PRIME/bin/desktop-launch
+  # desktop-qt5:
+  #   build-packages:
+  #     - build-essential
+  #     - qtbase5-dev
+  #     - dpkg-dev
+  #   make-parameters:
+  #     - FLAVOR=qt5
+  #   plugin: make
+  #   source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+  #   source-subdir: qt
+  #   stage-packages:
+  #     - libxkbcommon0
+  #     - ttf-ubuntu-font-family
+  #     - dmz-cursor-theme
+  #     - light-themes
+  #     - adwaita-icon-theme
+  #     - gnome-themes-standard
+  #     - shared-mime-info
+  #     - libqt5gui5
+  #     - libgdk-pixbuf2.0-0
+  #     - libqt5svg5
+  #     - try:
+  #         - appmenu-qt5
+  #     - locales-all
+  #     # - xdg-user-dirs
+  #     - libgtk2.0-0
+  #     - xdg-utils
+  #     - qt5-gtk-platformtheme
+  #   #   # Are all the below needed?
+  #   #   # - libqt5multimedia5-plugins
+  #   #   - qtmultimedia5-dev
+  #     - qtwayland5
+  #   override-prime: |
+  #     snapcraftctl prime
+  #     sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
+  #     sed -i 's|XDG_CONFIG_HOME=$SNAP_USER_DATA|XDG_CONFIG_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
+  #     sed -i '2iset -x' $SNAPCRAFT_PRIME/bin/desktop-launch
 
   plasma-integration:
     plugin: nil
@@ -165,18 +165,25 @@ parts:
       - patches
       - plasma-integration
       - launchers
-      - desktop-qt5
+      # - desktop-qt5
     plugin: nil
     build-snaps:  # List all content-snaps and base snaps you're using here
       - core18
-      - kde-frameworks-5-core18
+      # - kde-frameworks-5-core18
+      - kde-frameworks-5-qt-5-14-core18
       # - kde-frameworks-5-core18-sdk
     override-prime: |
       set -eux
       # for snap in "core18" "kde-frameworks-5-core18" "kde-frameworks-5-core18-sdk"; do  # List all content-snaps and base snaps you're using here
-      for snap in "core18" "kde-frameworks-5-core18"; do  # List all content-snaps and base snaps you're using here
+      for snap in "core18" "kde-frameworks-5-qt-5-14-core18"; do  # List all content-snaps and base snaps you're using here
         cd "/snap/$snap/current" && find . -type f,l -exec rm -f "$SNAPCRAFT_PRIME/{}" \;
       done
+  kde-neon-extension:
+    build-packages:
+    - g++
+    plugin: make
+    source: $SNAPCRAFT_EXTENSIONS_DIR/desktop
+    source-subdir: kde-neon
 
 plugs:
   gtk-3-themes:
@@ -191,6 +198,11 @@ plugs:
     interface: content
     target: $SNAP/data-dir/sounds
     default-provider: gtk-common-themes
+  kde-frameworks-5-plug:
+    content: kde-frameworks-5-core18-all
+    default-provider: kde-frameworks-5-qt-5-14-core18
+    interface: content
+    target: $SNAP/kf5
 
 layout:
   /usr/share/vulkan:
@@ -204,11 +216,11 @@ layout:
 
 apps:
   dolphin-emu:
-    extensions:
-      - kde-neon
+    # extensions:
+    #   - kde-neon
     command: usr/local/bin/dolphin-emu
     command-chain:
-      - bin/desktop-launch
+      # - bin/desktop-launch
       - bin/dolphin-launch
     # command: usr/local/bin/dolphin-emu
     desktop: usr/local/share/applications/dolphin-emu.desktop
@@ -258,5 +270,7 @@ apps:
       - gsettings
       - hardware-observe
       - mount-observe
+environment:
+  SNAP_DESKTOP_RUNTIME: $SNAP/kf5
 
 
