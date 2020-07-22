@@ -184,6 +184,9 @@ parts:
     plugin: make
     source: $SNAPCRAFT_EXTENSIONS_DIR/desktop
     source-subdir: kde-neon
+  kde-frameworks-5-env:
+    plugin: dump
+    source: https://anongit.kde.org/snap-kf5-launcher.git
 
 plugs:
   gtk-3-themes:
@@ -199,7 +202,7 @@ plugs:
     target: $SNAP/data-dir/sounds
     default-provider: gtk-common-themes
   kde-frameworks-5-plug:
-    content: kde-frameworks-5-core18-all
+    content: kde-frameworks-5-qt-5-14-core18-all
     default-provider: kde-frameworks-5-qt-5-14-core18
     interface: content
     target: $SNAP/kf5
@@ -220,7 +223,9 @@ apps:
     #   - kde-neon
     command: usr/local/bin/dolphin-emu
     command-chain:
+      - kf5-launch
       # - bin/desktop-launch
+      # - snap/command-chain/desktop-launch
       - bin/dolphin-launch
     # command: usr/local/bin/dolphin-emu
     desktop: usr/local/share/applications/dolphin-emu.desktop
@@ -232,6 +237,7 @@ apps:
       # KF5_LIBEXEC_DIR: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5"
       PATH: "$PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5" # Allows kioslave5 to be found, above commented env variable doesn't work for some reason  
     plugs:
+      - kde-frameworks-5-plug
       - desktop
       - desktop-legacy
       - x11
@@ -270,7 +276,5 @@ apps:
       - gsettings
       - hardware-observe
       - mount-observe
-environment:
-  SNAP_DESKTOP_RUNTIME: $SNAP/kf5
 
 
