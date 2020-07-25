@@ -1,6 +1,6 @@
 name: dolphin-emulator
 base: core18
-version: '5.0-core18'
+version: '5.0-core18-kf5-qt5.14'
 summary: A Wii/GameCube Emulator
 description: |
   Dolphin is an emulator for two recent Nintendo video game consoles: the GameCube and the Wii. 
@@ -39,47 +39,39 @@ parts:
       - libpangocairo-1.0-0
       - libgtk2.0-dev
       - libbluetooth-dev
-      # - qt5-default
-      # - qtbase5-private-dev
-      # - qtbase5-dev
       - libudev-dev
     stage-packages:
-      - libusb-1.0-0-dev
+      - libusb-1.0-0
       - ffmpeg
-      - libavcodec-dev
+      - libavcodec57
       - libhidapi-dev
-      - libsfml-dev
-      - libmbedtls-dev
-      - libminiupnpc-dev
-      - libavformat-dev
-      - libbluetooth-dev
-      - freeglut3
-      - libglu1
-      - libpulse0
-      - libslang2
+      - libsfml-audio2.4
+      - libsfml-graphics2.4
+      - libsfml-network2.4
+      - libsfml-system2.4
+      - libsfml-window2.4
+      - libmbedtls10
+      - libminiupnpc10
+      - libavformat57
+      - libbluetooth3
+      # - libpulse0
       # Are all the below needed?
+      - libgtk2.0-0
+      - libgl1-mesa-dri
       - libxcb-xinerama0
       - libxinerama1
-      - libgtk2.0-dev
-      - libpulse-dev
-      - libgl1-mesa-dev
-      - libswscale-dev
-      # - libwxbase3.0-dev
-      # - libwxgtk3.0-gtk3-dev
+      - libswscale4
       - libpangocairo-1.0-0
-      - libudev-dev
+      - libudev1
       # Additions from yuzu yaml
       - libcanberra-gtk-module
-      - libvulkan-dev
+      - libvulkan1
       - mesa-vulkan-drivers
       - nvidia-driver-440 # seems to fix nvidia vulkan at the cost of adding 100MB+ to final package, may be able to cleanup unecessary files?
       - vulkan-utils
-      # Fromm ppa dependencies
-      - libqt5widgets5
-      - libqt5core5a
-      - libqt5network5
       - libbluray2
-      - qt5-gtk-platformtheme
+      - xdg-utils
+      # - qt5-gtk-platformtheme
     override-pull: |
       snapcraftctl pull
       git apply $SNAPCRAFT_STAGE/shared-memory.patch
@@ -94,44 +86,6 @@ parts:
         usr/local/share/dolphin-emu/sys: usr/local/bin/Sys
     after:
       - patches
-  # desktop-qt5:
-  #   build-packages:
-  #     - build-essential
-  #     - qtbase5-dev
-  #     - dpkg-dev
-  #   make-parameters:
-  #     - FLAVOR=qt5
-  #   plugin: make
-  #   source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-  #   source-subdir: qt
-  #   stage-packages:
-  #     - libxkbcommon0
-  #     - ttf-ubuntu-font-family
-  #     - dmz-cursor-theme
-  #     - light-themes
-  #     - adwaita-icon-theme
-  #     - gnome-themes-standard
-  #     - shared-mime-info
-  #     - libqt5gui5
-  #     - libgdk-pixbuf2.0-0
-  #     - libqt5svg5
-  #     - try:
-  #         - appmenu-qt5
-  #     - locales-all
-  #     # - xdg-user-dirs
-  #     - libgtk2.0-0
-  #     - xdg-utils
-  #     - qt5-gtk-platformtheme
-  #   #   # Are all the below needed?
-  #   #   # - libqt5multimedia5-plugins
-  #   #   - qtmultimedia5-dev
-  #     - qtwayland5
-  #   override-prime: |
-  #     snapcraftctl prime
-  #     sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
-  #     sed -i 's|XDG_CONFIG_HOME=$SNAP_USER_DATA|XDG_CONFIG_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
-  #     sed -i '2iset -x' $SNAPCRAFT_PRIME/bin/desktop-launch
-
   plasma-integration:
     plugin: nil
     stage-packages:
@@ -151,7 +105,6 @@ parts:
     source-type: local
     prime:
       - -*
-
   # This part removes all the files in this snap which already exist in
   # connected content and base snaps. Since these files will be available
   # at runtime from the content and base snaps, they do not need to be
@@ -165,13 +118,11 @@ parts:
       - patches
       - plasma-integration
       - launchers
-      # - desktop-qt5
     plugin: nil
     build-snaps:  # List all content-snaps and base snaps you're using here
       - core18
       # - kde-frameworks-5-core18
       - kde-frameworks-5-qt-5-14-core18
-      # - kde-frameworks-5-core18-sdk
     override-prime: |
       set -eux
       # for snap in "core18" "kde-frameworks-5-core18" "kde-frameworks-5-core18-sdk"; do  # List all content-snaps and base snaps you're using here
@@ -234,8 +185,6 @@ apps:
       LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
       KDE_FORK_SLAVES: 1
       DISABLE_WAYLAND: 1
-      # KF5_LIBEXEC_DIR: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5"
-      PATH: "$PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5" # Allows kioslave5 to be found, above commented env variable doesn't work for some reason  
     plugs:
       - kde-frameworks-5-plug
       - desktop
