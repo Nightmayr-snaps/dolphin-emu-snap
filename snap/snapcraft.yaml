@@ -174,11 +174,8 @@ apps:
     #   - kde-neon
     command: usr/local/bin/dolphin-emu
     command-chain:
-      - kf5-launch
-      # - bin/desktop-launch
-      # - snap/command-chain/desktop-launch
+      - snap/command-chain/desktop-launch
       - bin/dolphin-launch
-    # command: usr/local/bin/dolphin-emu
     desktop: usr/local/share/applications/dolphin-emu.desktop
     environment:
       HOME: "$SNAP_USER_COMMON"
@@ -225,5 +222,7 @@ apps:
       - gsettings
       - hardware-observe
       - mount-observe
+environment:
+  SNAP_DESKTOP_RUNTIME: $SNAP/kf5
 
 
