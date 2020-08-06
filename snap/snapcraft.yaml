@@ -15,8 +15,13 @@ architectures:
 parts:
   dolphin-emu:
     plugin: cmake
+    cmake-parameters:
+    - "-DCMAKE_BUILD_TYPE=Release"
+    - "-DCMAKE_INSTALL_PREFIX=/usr/local"
+    - "-DLINUX_LOCAL_DEV=TRUE"
+    - "-DENABLE_SDL=ON"
     source: https://github.com/dolphin-emu/dolphin.git
-    source-commit: 9c12a843f86d39bc64d9e9b5b670e67455487739
+    source-tag: '5.0'
     build-packages:
       - ffmpeg 
       - libavcodec-dev
@@ -28,6 +33,7 @@ parts:
       - libminiupnpc-dev
       - libmbedtls-dev
       - libhidapi-dev
+      - libpulse-dev
       - libpangocairo-1.0-0
       - libgtk2.0-dev
       - libbluetooth-dev
@@ -36,48 +42,50 @@ parts:
       - qtbase5-dev
       - libudev-dev
     stage-packages:
-      - libusb-1.0-0-dev
+      - libusb-1.0-0
       - ffmpeg
-      - libavcodec-dev
+      - libavcodec58
       - libhidapi-dev
-      - libsfml-dev
-      - libmbedtls-dev
-      - libminiupnpc-dev
-      - libavformat-dev
-      - libbluetooth-dev
-      - freeglut3
-      - libglu1
+      - libsfml-audio2.5
+      - libsfml-graphics2.5
+      - libsfml-network2.5
+      - libsfml-system2.5
+      - libsfml-window2.5
+      - libmbedtls12
+      - libminiupnpc17
+      - libavformat58
+      - libbluetooth3
       - libpulse0
+      - libgtk2.0-0
       # Are all the below needed?
+      - libgl1-mesa-dri
       - libxcb-xinerama0
       - libxinerama1
-      - libgtk2.0-dev
-      - libpulse-dev
-      - libgl1-mesa-dev
-      - libswscale-dev
-      - libwxbase3.0-dev
-      - libwxgtk3.0-gtk3-dev
+      - libswscale5
       - libpangocairo-1.0-0
-      - libudev-dev
-      # Additions from yuzu yaml
+      - libudev1
       - libcanberra-gtk-module
-      - libvulkan-dev
+      - libvulkan1
       - mesa-vulkan-drivers
       - nvidia-driver-440 # seems to fix nvidia vulkan at the cost of adding 100MB+ to final package, may be able to cleanup unecessary files?
       - vulkan-utils
-      # Fromm ppa dependencies
-      - libqt5widgets5
-      - libqt5core5a
-      - libqt5network5
       - libbluray2
+      - xdg-utils
+      - freeglut3
     override-pull: |
       snapcraftctl pull
-      git apply $SNAPCRAFT_STAGE/shared-memory.patch
-      git apply $SNAPCRAFT_STAGE/nodirtyversion.patch
-      git apply $SNAPCRAFT_STAGE/forcexdg.patch
+      git apply $SNAPCRAFT_STAGE/5.0/reformatxgetbv.patch
+      git apply $SNAPCRAFT_STAGE/5.0/sharedmemory.patch
+      git apply $SNAPCRAFT_STAGE/5.0/rasterfontconstnames.patch
+      # git apply $SNAPCRAFT_STAGE/nodirtyversion.patch
+      # git apply $SNAPCRAFT_STAGE/forcexdg.patch
     override-build: |
       snapcraftctl build
       sed -i 's|Icon=dolphin-emu|Icon=/usr/local/share/icons/hicolor/scalable/apps/dolphin-emu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
+      sed -i 's|Exec=env QT_QPA_PLATFORM=xcb dolphin-emu|Exec=dolphin-emu|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
+    organize: 
+        #Copy Sys folder to the Binaries folder
+        usr/local/share/dolphin-emu/sys: usr/local/bin/Sys
     after:
       - patches
   desktop-qt5:
