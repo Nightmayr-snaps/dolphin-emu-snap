@@ -1,5 +1,5 @@
 name: dolphin-emulator
-base: core20
+base: core
 version: '5.0'
 summary: A Wii/GameCube Emulator
 description: |
@@ -15,7 +15,8 @@ architectures:
 parts:
   dolphin-emu:
     plugin: cmake
-    cmake-parameters:
+    # cmake-parameters:
+    configflags:
     - "-DCMAKE_BUILD_TYPE=Release"
     - "-DCMAKE_INSTALL_PREFIX=/usr/local"
     - "-DLINUX_LOCAL_DEV=TRUE"
@@ -23,12 +24,17 @@ parts:
     source: https://github.com/dolphin-emu/dolphin.git
     source-tag: '5.0'
     build-packages:
+      - build-essential
       - ffmpeg 
       - libavcodec-dev
       - libevdev-dev
       - libusb-1.0-0-dev
       - libavformat-dev
       - libswscale-dev
+      - libwxbase3.0-dev
+      - libwxgtk3.0-dev
+      - libsdl2-dev
+      # - libwxgtk3.0-gtk3-dev
       - libsfml-dev
       - libminiupnpc-dev
       - libmbedtls-dev
@@ -41,35 +47,77 @@ parts:
       - qtbase5-private-dev
       - qtbase5-dev
       - libudev-dev
+    # Stage packages for core18
+    # stage-packages:
+    #   - libusb-1.0-0
+    #   - ffmpeg
+    #   - libavcodec57
+    #   - libhidapi-dev
+    #   - libsfml-audio2.4
+    #   - libsfml-graphics2.4
+    #   - libsfml-network2.4
+    #   - libsfml-system2.4
+    #   - libsfml-window2.4
+    #   - libmbedtls10
+    #   - libminiupnpc10
+    #   - libavformat57
+    #   - libbluetooth3
+    #   - libpulse0
+    #   - libgtk2.0-0
+    #   - libwxgtk3.0-0v5
+    #   - libwxbase3.0-0v5
+    #   - libswscale4
+    #   - libslang2
+    #   - libevdev2
+    #   - libglu1-mesa
+    #   - libsdl2-2.0-0
+    #   - liburi-encode-perl
+    #   # Are all the below needed?
+    #   - libgl1-mesa-dri
+    #   - libxcb-xinerama0
+    #   - libxinerama1
+    #   - libpangocairo-1.0-0
+    #   - libudev1
+    #   - libcanberra-gtk-module
+    #   # - libvulkan1
+    #   # - mesa-vulkan-drivers
+    #   # - nvidia-driver-440 # seems to fix nvidia vulkan at the cost of adding 100MB+ to final package, may be able to cleanup unecessary files?
+    #   # - vulkan-utils
+    #   - libbluray2
+    #   - xdg-utils
+    #   - freeglut3
     stage-packages:
       - libusb-1.0-0
       - ffmpeg
-      - libavcodec58
+      - libavcodec-ffmpeg56
       - libhidapi-dev
-      - libsfml-audio2.5
-      - libsfml-graphics2.5
-      - libsfml-network2.5
-      - libsfml-system2.5
-      - libsfml-window2.5
-      - libmbedtls12
-      - libminiupnpc17
-      - libavformat58
+      - libsfml-audio2.3v5
+      - libsfml-graphics2.3v5
+      - libsfml-network2.3v5
+      - libsfml-system2.3v5
+      - libsfml-window2.3v5
+      - libmbedtls10
+      - libminiupnpc10
+      - libavformat-ffmpeg56
       - libbluetooth3
       - libpulse0
       - libgtk2.0-0
+      - libwxgtk3.0-0v5
+      - libwxbase3.0-0v5
+      - libswscale-ffmpeg3
+      - libslang2
+      - libevdev2
+      - libglu1-mesa
+      - libsdl2-2.0-0
+      - liburi-encode-perl
       # Are all the below needed?
       - libgl1-mesa-dri
       - libxcb-xinerama0
       - libxinerama1
-      - libswscale5
       - libpangocairo-1.0-0
       - libudev1
       - libcanberra-gtk-module
-      - libvulkan1
-      - mesa-vulkan-drivers
-      - nvidia-driver-440 # seems to fix nvidia vulkan at the cost of adding 100MB+ to final package, may be able to cleanup unecessary files?
-      - vulkan-utils
-      - libbluray2
+      - libbluray1
       - xdg-utils
       - freeglut3
     override-pull: |
@@ -77,7 +125,7 @@ parts:
       git apply $SNAPCRAFT_STAGE/5.0/reformatxgetbv.patch
       git apply $SNAPCRAFT_STAGE/5.0/sharedmemory.patch
       git apply $SNAPCRAFT_STAGE/5.0/rasterfontconstnames.patch
-      # git apply $SNAPCRAFT_STAGE/nodirtyversion.patch
+      git apply $SNAPCRAFT_STAGE/5.0/removedirtyversion.patch
       # git apply $SNAPCRAFT_STAGE/forcexdg.patch
     override-build: |
       snapcraftctl build
@@ -99,42 +147,40 @@ parts:
     source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
     source-subdir: qt
     stage-packages:
-      - libxkbcommon0
-      - ttf-ubuntu-font-family
-      - dmz-cursor-theme
-      - light-themes
-      - adwaita-icon-theme
-      - gnome-themes-standard
-      - shared-mime-info
-      - libqt5gui5
-      - libgdk-pixbuf2.0-0
-      - libqt5svg5
-      - try:
-          - appmenu-qt5
       - locales-all
       - xdg-user-dirs
-      - libgtk2.0-0
-      - qt5-gtk-platformtheme
-      # Are all the below needed?
-      # - libqt5multimedia5-plugins
-      - qtmultimedia5-dev
-      - qtwayland5
     override-prime: |
       snapcraftctl prime
       sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
       sed -i 's|XDG_CONFIG_HOME=$SNAP_USER_DATA|XDG_CONFIG_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
-  plasma-integration:
-    plugin: nil
-    stage-packages:
-      - breeze-icon-theme
-      - kde-style-breeze
-      - plasma-integration
   patches:
     plugin: dump
     source: snap/local/patches
     source-type: local
     prime:
       - -*
+  # This part removes all the files in this snap which already exist in
+  # connected content and base snaps. Since these files will be available
+  # at runtime from the content and base snaps, they do not need to be
+  # included in this snap itself.
+  #
+  # More info: https://snapcraft-utils-library.readthedocs.io/en/latest/lib/cleanup.html 
+  #
+  cleanup:
+    after:  # Make this part run last; list all your other parts here
+      - dolphin-emu
+      - patches
+      - desktop-qt5
+    plugin: nil
+    build-snaps:  # List all content-snaps and base snaps you're using here
+      - core
+      # - kde-frameworks-5-core18
+    override-prime: |
+      set -eux
+      # for snap in "core18" "kde-frameworks-5-core18" "kde-frameworks-5-core18-sdk"; do  # List all content-snaps and base snaps you're using here
+      for snap in "core"; do  # List all content-snaps and base snaps you're using here
+        cd "/snap/$snap/current" && find . -type f -exec rm -f "$SNAPCRAFT_PRIME/{}" \;
+      done
 
 plugs:
   gtk-3-themes:
