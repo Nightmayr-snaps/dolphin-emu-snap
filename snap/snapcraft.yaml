@@ -237,5 +237,3 @@ apps:
       - gsettings
       - hardware-observe
       - mount-observe
-
-
