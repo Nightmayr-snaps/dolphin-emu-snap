@@ -58,7 +58,7 @@ paramiko==2.6.0
 parse==1.16.0
 patch-ng==1.17.4
 pexpect==4.6.0
-Pillow==7.0.0
+Pillow==7.1.0
 pluginbase==0.7
 protobuf==3.6.1
 pycairo==1.16.2
