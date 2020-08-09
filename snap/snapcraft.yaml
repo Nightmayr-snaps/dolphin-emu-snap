@@ -1,6 +1,6 @@
 name: dolphin-emulator
-base: core18
-version: '5.0-core18'
+base: core20
+version: '5.0-beta'
 summary: A Wii/GameCube Emulator
 description: |
   Dolphin is an emulator for two recent Nintendo video game consoles: the GameCube and the Wii. 
@@ -15,18 +15,16 @@ architectures:
 parts:
   dolphin-emu:
     plugin: cmake
-    configflags:
+    cmake-parameters:
     - "-DCMAKE_BUILD_TYPE=Release"
     - "-DCMAKE_INSTALL_PREFIX=/usr/local"
     - "-DLINUX_LOCAL_DEV=TRUE"
     - "-DENABLE_SDL=ON"
     source: https://github.com/dolphin-emu/dolphin.git
     source-commit: 9c12a843f86d39bc64d9e9b5b670e67455487739
-    build-snaps:
-      - kde-frameworks-5-core18-sdk
-      # - kde-frameworks-5-core18
     build-packages:
       - ffmpeg 
+      - libsdl2-dev
       - libavcodec-dev
       - libevdev-dev
       - libusb-1.0-0-dev
@@ -39,52 +37,50 @@ parts:
       - libpangocairo-1.0-0
       - libgtk2.0-dev
       - libbluetooth-dev
-      # - qt5-default
-      # - qtbase5-private-dev
-      # - qtbase5-dev
       - libudev-dev
-    stage-packages:
-      - libusb-1.0-0-dev
-      - ffmpeg
-      - libavcodec-dev
-      - libhidapi-dev
-      - libsfml-dev
-      - libmbedtls-dev
-      - libminiupnpc-dev
-      - libavformat-dev
-      - libbluetooth-dev
-      - freeglut3
-      - libglu1
-      - libpulse0
-      - libslang2
-      # Are all the below needed?
-      - libxcb-xinerama0
-      - libxinerama1
-      - libgtk2.0-dev
       - libpulse-dev
-      - libgl1-mesa-dev
-      - libswscale-dev
-      # - libwxbase3.0-dev
-      # - libwxgtk3.0-gtk3-dev
-      - libpangocairo-1.0-0
-      - libudev-dev
-      # Additions from yuzu yaml
+      - qtbase5-private-dev
+    stage-packages:
+      - libusb-1.0-0
+      - libhidapi-hidraw0
+      - libhidapi-libusb0
+      - ffmpeg
+      - libavcodec58
+      - libavformat58
+      - libsfml-audio2.5
+      - libsfml-graphics2.5
+      - libsfml-network2.5
+      - libsfml-system2.5
+      - libsfml-window2.5
+      - libmbedtls12
+      - libminiupnpc17
+      - libswscale5
+      - libbluetooth3
+      - libpulse0
+      - libgtk2.0-0
+      - libslang2
+      - libevdev2
+      - libglu1-mesa
+      - libsdl2-2.0-0
+      - libopengl0
+      - libudev1
       - libcanberra-gtk-module
-      - libvulkan-dev
+      - libvulkan1
       - mesa-vulkan-drivers
       - nvidia-driver-440 # seems to fix nvidia vulkan at the cost of adding 100MB+ to final package, may be able to cleanup unecessary files?
       - vulkan-utils
-      # Fromm ppa dependencies
-      - libqt5widgets5
-      - libqt5core5a
-      - libqt5network5
       - libbluray2
-      - qt5-gtk-platformtheme
+      - xdg-utils
+      - freeglut3
+      # Are all the below needed?
+      - libgl1-mesa-dri
+      - libxcb-xinerama0
+      - libxinerama1
+      - libpangocairo-1.0-0
     override-pull: |
       snapcraftctl pull
-      git apply $SNAPCRAFT_STAGE/shared-memory.patch
+      git apply $SNAPCRAFT_STAGE/sharedmemory.patch
       git apply $SNAPCRAFT_STAGE/nodirtyversion.patch
-      git apply $SNAPCRAFT_STAGE/forcexdg.patch
     override-build: |
       snapcraftctl build
       sed -i 's|Icon=dolphin-emu|Icon=/usr/local/share/icons/hicolor/scalable/apps/dolphin-emu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
@@ -118,19 +114,18 @@ parts:
       - try:
           - appmenu-qt5
       - locales-all
-      # - xdg-user-dirs
+      - xdg-user-dirs
       - libgtk2.0-0
       - xdg-utils
       - qt5-gtk-platformtheme
-    #   # Are all the below needed?
-    #   # - libqt5multimedia5-plugins
-    #   - qtmultimedia5-dev
+      # Are all the below needed?
+      # - libqt5multimedia5-plugins
+      # - qtmultimedia5-dev
       - qtwayland5
     override-prime: |
       snapcraftctl prime
       sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
       sed -i 's|XDG_CONFIG_HOME=$SNAP_USER_DATA|XDG_CONFIG_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
-      sed -i '2iset -x' $SNAPCRAFT_PRIME/bin/desktop-launch
 
   plasma-integration:
     plugin: nil
@@ -139,12 +134,6 @@ parts:
       - kde-style-breeze
       - plasma-integration
       - libgpm2
-  launchers:
-    plugin: dump
-    source: snap/local/launchers
-    source-type: local
-    organize:
-      '*': bin/
   patches:
     plugin: dump
     source: snap/local/patches
@@ -164,17 +153,13 @@ parts:
       - dolphin-emu
       - patches
       - plasma-integration
-      - launchers
       - desktop-qt5
     plugin: nil
     build-snaps:  # List all content-snaps and base snaps you're using here
       - core18
-      - kde-frameworks-5-core18
-      # - kde-frameworks-5-core18-sdk
     override-prime: |
       set -eux
-      # for snap in "core18" "kde-frameworks-5-core18" "kde-frameworks-5-core18-sdk"; do  # List all content-snaps and base snaps you're using here
-      for snap in "core18" "kde-frameworks-5-core18"; do  # List all content-snaps and base snaps you're using here
+      for snap in "core18"; do  # List all content-snaps and base snaps you're using here
         cd "/snap/$snap/current" && find . -type f,l -exec rm -f "$SNAPCRAFT_PRIME/{}" \;
       done
 
@@ -204,13 +189,7 @@ layout:
 
 apps:
   dolphin-emu:
-    extensions:
-      - kde-neon
-    command: usr/local/bin/dolphin-emu
-    command-chain:
-      - bin/desktop-launch
-      - bin/dolphin-launch
-    # command: usr/local/bin/dolphin-emu
+    command: bin/desktop-launch $SNAP/usr/local/bin/dolphin-emu
     desktop: usr/local/share/applications/dolphin-emu.desktop
     environment:
       HOME: "$SNAP_USER_COMMON"

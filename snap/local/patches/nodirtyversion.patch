@@ -1,12 +1,3 @@
-From 3490e1d6049e4c410dfea673674ca315ea3f4079 Mon Sep 17 00:00:00 2001
-From: Umayr Saghir <umayr23@gmail.com>
-Date: Wed, 8 Jul 2020 18:17:42 +0100
-Subject: [PATCH] removing dirty from final version
-
----
- CMakeLists.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 26484938a32..43bd61b768e 100644
 --- a/CMakeLists.txt

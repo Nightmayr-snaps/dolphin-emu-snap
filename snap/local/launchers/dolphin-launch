@@ -9,7 +9,5 @@ else
   export QT_QPA_PLATFORMTHEME=gtk3
 fi
 
-unset FONTCONFIG_FILE 
-unset FONTCONFIG_PATH
 
 exec "${@}"

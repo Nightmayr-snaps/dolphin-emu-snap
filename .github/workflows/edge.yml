@@ -1,0 +1,48 @@
+name: Build-Snap
+
+on:
+  schedule:
+    - cron: '0 */5 * * *'
+    - cron: '15 13 * * *'
+  push:
+    branches: [ edge ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[ci-skip]')"
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: edge
+        token: ${{ secrets.PAT }}
+    - name: Install python3 and pip modules
+      run: |
+        sudo apt install python3 -y
+        sudp apt install python3-pip -y
+        sudo pip3 install ./.github/scripts/requirements.txt
+    - name: Check latest version
+      run: |
+        ./.github/scripts/version.py
+        echo ::set-env name=BUILD::$(cat build)
+      id: version-check
+    - name: Already latest versions - cancelling
+      if: env.BUILD == 'false'
+      uses: andymckay/cancel-action@0.2
+    - uses: snapcore/action-build@v1
+      id: snapcraft
+    - name: Testing snap
+      run: |
+        sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
+        snap run dolphin-emulator.dolphin-emu-nogui --version
+    - uses: snapcore/action-publish@v1
+      with:
+        store_login: ${{ secrets.STORE_LOGIN }}
+        snap: ${{ steps.snapcraft.outputs.snap }}
+        release: edge
+    - name: Committing updated snapcraft.yaml
+      run: |
+        git config --global user.name 'Nightmayr'
+        git config --global user.email 'umayr23@gmail.com'
+        git commit -am "Updating version [ci-skip]"
+        git push origin edge

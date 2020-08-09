@@ -1,12 +1,3 @@
-From cd5c032602f8c87cd769a006575516290527d9ae Mon Sep 17 00:00:00 2001
-From: Umayr Saghir <umayr23@gmail.com>
-Date: Tue, 7 Jul 2020 18:00:47 +0100
-Subject: [PATCH] Updated shared memory file descriptor for snap
-
----
- Source/Core/Common/MemArena.cpp | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
 diff --git a/Source/Core/Common/MemArena.cpp b/Source/Core/Common/MemArena.cpp
 index fcd18892baf..650849f2e63 100644
 --- a/Source/Core/Common/MemArena.cpp
