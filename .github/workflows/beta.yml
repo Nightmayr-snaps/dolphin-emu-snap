@@ -1,4 +1,4 @@
-name: Build-Snap
+name: Build-Snap-Beta
 
 on:
   schedule:
