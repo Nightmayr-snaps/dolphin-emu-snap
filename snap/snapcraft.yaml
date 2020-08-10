@@ -34,7 +34,6 @@ parts:
       - libwxbase3.0-dev
       - libwxgtk3.0-dev
       - libsdl2-dev
-      # - libwxgtk3.0-gtk3-dev
       - libsfml-dev
       - libminiupnpc-dev
       - libmbedtls-dev
@@ -187,10 +186,10 @@ plugs:
     interface: content
     target: $SNAP/data-dir/themes
     default-provider: gtk-common-themes
-  gtk-2-themes:
-    interface: content
-    target: $SNAP/data-dir/themes
-    default-provider: gtk-common-themes:gtk-2-themes
+  # gtk-2-themes:
+  #   interface: content
+  #   target: $SNAP/data-dir/themes
+  #   default-provider: gtk-common-themes:gtk-2-themes
   icon-themes:
     interface: content
     target: $SNAP/data-dir/icons
@@ -226,7 +225,7 @@ apps:
       - desktop-legacy
       - x11
       - wayland
-      - pulseaudio
+      - audio-playback
       - opengl
       - joystick
       - unity7
@@ -250,7 +249,7 @@ apps:
       - desktop-legacy
       - x11
       - wayland
-      - pulseaudio
+      - audio-playback
       - opengl
       - joystick
       - unity7
