@@ -1,82 +1,81 @@
 name: dolphin-emulator
 base: core20
-version: '5.0-beta'
+version: 5.0-12247
 summary: A Wii/GameCube Emulator
-description: |
-  Dolphin is an emulator for two recent Nintendo video game consoles: the GameCube and the Wii. 
-  It allows PC gamers to enjoy games for these two consoles in full HD (1080p) with 
-  several enhancements: compatibility with all PC controllers, turbo speed, networked multiplayer, and even more.
+description: "Dolphin is an emulator for two recent Nintendo video game consoles:\
+  \ the GameCube and the Wii. \nIt allows PC gamers to enjoy games for these two consoles\
+  \ in full HD (1080p) with \nseveral enhancements: compatibility with all PC controllers,\
+  \ turbo speed, networked multiplayer, and even more.\n"
 license: GPL-2.0
 icon: snap/gui/dolphin-emu.png
 grade: stable
 confinement: strict
 architectures:
-  - build-on: amd64
+- build-on: amd64
 parts:
   dolphin-emu:
     plugin: cmake
     cmake-parameters:
-    - "-DCMAKE_BUILD_TYPE=Release"
-    - "-DCMAKE_INSTALL_PREFIX=/usr/local"
-    - "-DLINUX_LOCAL_DEV=TRUE"
-    - "-DENABLE_SDL=ON"
+    - -DCMAKE_BUILD_TYPE=Release
+    - -DCMAKE_INSTALL_PREFIX=/usr/local
+    - -DLINUX_LOCAL_DEV=TRUE
+    - -DENABLE_SDL=ON
     source: https://github.com/dolphin-emu/dolphin.git
     source-commit: 9c12a843f86d39bc64d9e9b5b670e67455487739
     build-packages:
-      - ffmpeg 
-      - libsdl2-dev
-      - libavcodec-dev
-      - libevdev-dev
-      - libusb-1.0-0-dev
-      - libavformat-dev
-      - libswscale-dev
-      - libsfml-dev
-      - libminiupnpc-dev
-      - libmbedtls-dev
-      - libhidapi-dev
-      - libpangocairo-1.0-0
-      - libgtk2.0-dev
-      - libbluetooth-dev
-      - libudev-dev
-      - libpulse-dev
-      - qtbase5-private-dev
+    - ffmpeg
+    - libsdl2-dev
+    - libavcodec-dev
+    - libevdev-dev
+    - libusb-1.0-0-dev
+    - libavformat-dev
+    - libswscale-dev
+    - libsfml-dev
+    - libminiupnpc-dev
+    - libmbedtls-dev
+    - libhidapi-dev
+    - libpangocairo-1.0-0
+    - libgtk2.0-dev
+    - libbluetooth-dev
+    - libudev-dev
+    - libpulse-dev
+    - qtbase5-private-dev
     stage-packages:
-      - libusb-1.0-0
-      - libhidapi-hidraw0
-      - libhidapi-libusb0
-      - ffmpeg
-      - libavcodec58
-      - libavformat58
-      - libsfml-audio2.5
-      - libsfml-graphics2.5
-      - libsfml-network2.5
-      - libsfml-system2.5
-      - libsfml-window2.5
-      - libmbedtls12
-      - libminiupnpc17
-      - libswscale5
-      - libbluetooth3
-      - libpulse0
-      - libgtk2.0-0
-      - libslang2
-      - libevdev2
-      - libglu1-mesa
-      - libsdl2-2.0-0
-      - libopengl0
-      - libudev1
-      - libcanberra-gtk-module
-      - libvulkan1
-      - mesa-vulkan-drivers
-      - nvidia-driver-440 # seems to fix nvidia vulkan at the cost of adding 100MB+ to final package, may be able to cleanup unecessary files?
-      - vulkan-utils
-      - libbluray2
-      - xdg-utils
-      - freeglut3
-      # Are all the below needed?
-      - libgl1-mesa-dri
-      - libxcb-xinerama0
-      - libxinerama1
-      - libpangocairo-1.0-0
+    - libusb-1.0-0
+    - libhidapi-hidraw0
+    - libhidapi-libusb0
+    - ffmpeg
+    - libavcodec58
+    - libavformat58
+    - libsfml-audio2.5
+    - libsfml-graphics2.5
+    - libsfml-network2.5
+    - libsfml-system2.5
+    - libsfml-window2.5
+    - libmbedtls12
+    - libminiupnpc17
+    - libswscale5
+    - libbluetooth3
+    - libpulse0
+    - libgtk2.0-0
+    - libslang2
+    - libevdev2
+    - libglu1-mesa
+    - libsdl2-2.0-0
+    - libopengl0
+    - libudev1
+    - libcanberra-gtk-module
+    - libvulkan1
+    - mesa-vulkan-drivers
+    - nvidia-driver-440
+    - vulkan-utils
+    - libbluray2
+    - xdg-utils
+    - freeglut3
+    - libgl1-mesa-dri
+    - libxcb-xinerama0
+    - libxinerama1
+    - libpangocairo-1.0-0
     override-pull: |
       snapcraftctl pull
       git apply $SNAPCRAFT_STAGE/sharedmemory.patch
@@ -85,84 +84,70 @@ parts:
       snapcraftctl build
       sed -i 's|Icon=dolphin-emu|Icon=/usr/local/share/icons/hicolor/scalable/apps/dolphin-emu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
       sed -i 's|Exec=env QT_QPA_PLATFORM=xcb dolphin-emu|Exec=dolphin-emu|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
-    organize: 
-        #Copy Sys folder to the Binaries folder
-        usr/local/share/dolphin-emu/sys: usr/local/bin/Sys
+    organize:
+      usr/local/share/dolphin-emu/sys: usr/local/bin/Sys
     after:
-      - patches
+    - patches
   desktop-qt5:
     build-packages:
-      - build-essential
-      - qtbase5-dev
-      - dpkg-dev
+    - build-essential
+    - qtbase5-dev
+    - dpkg-dev
     make-parameters:
-      - FLAVOR=qt5
+    - FLAVOR=qt5
     plugin: make
     source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
     source-subdir: qt
     stage-packages:
-      - libxkbcommon0
-      - ttf-ubuntu-font-family
-      - dmz-cursor-theme
-      - light-themes
-      - adwaita-icon-theme
-      - gnome-themes-standard
-      - shared-mime-info
-      - libqt5gui5
-      - libgdk-pixbuf2.0-0
-      - libqt5svg5
-      - try:
-          - appmenu-qt5
-      - locales-all
-      - xdg-user-dirs
-      - libgtk2.0-0
-      - xdg-utils
-      - qt5-gtk-platformtheme
-      # Are all the below needed?
-      # - libqt5multimedia5-plugins
-      # - qtmultimedia5-dev
-      - qtwayland5
+    - libxkbcommon0
+    - ttf-ubuntu-font-family
+    - dmz-cursor-theme
+    - light-themes
+    - adwaita-icon-theme
+    - gnome-themes-standard
+    - shared-mime-info
+    - libqt5gui5
+    - libgdk-pixbuf2.0-0
+    - libqt5svg5
+    - try:
+      - appmenu-qt5
+    - locales-all
+    - xdg-user-dirs
+    - libgtk2.0-0
+    - xdg-utils
+    - qt5-gtk-platformtheme
+    - qtwayland5
     override-prime: |
       snapcraftctl prime
       sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
       sed -i 's|XDG_CONFIG_HOME=$SNAP_USER_DATA|XDG_CONFIG_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
-
   plasma-integration:
     plugin: nil
     stage-packages:
-      - breeze-icon-theme
-      - kde-style-breeze
-      - plasma-integration
-      - libgpm2
+    - breeze-icon-theme
+    - kde-style-breeze
+    - plasma-integration
+    - libgpm2
   patches:
     plugin: dump
     source: snap/local/patches
     source-type: local
     prime:
-      - -*
-
-  # This part removes all the files in this snap which already exist in
-  # connected content and base snaps. Since these files will be available
-  # at runtime from the content and base snaps, they do not need to be
-  # included in this snap itself.
-  #
-  # More info: https://snapcraft-utils-library.readthedocs.io/en/latest/lib/cleanup.html 
-  #
+    - -*
   cleanup:
-    after:  # Make this part run last; list all your other parts here
-      - dolphin-emu
-      - patches
-      - plasma-integration
-      - desktop-qt5
+    after:
+    - dolphin-emu
+    - patches
+    - plasma-integration
+    - desktop-qt5
     plugin: nil
-    build-snaps:  # List all content-snaps and base snaps you're using here
-      - core18
+    build-snaps:
+    - core18
     override-prime: |
       set -eux
       for snap in "core18"; do  # List all content-snaps and base snaps you're using here
         cd "/snap/$snap/current" && find . -type f,l -exec rm -f "$SNAPCRAFT_PRIME/{}" \;
       done
-
 plugs:
   gtk-3-themes:
     interface: content
@@ -176,7 +161,6 @@ plugs:
     interface: content
     target: $SNAP/data-dir/sounds
     default-provider: gtk-common-themes
-
 layout:
   /usr/share/vulkan:
     symlink: $SNAP/usr/share/vulkan
@@ -186,56 +170,51 @@ layout:
     symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so
   /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libGLX_nvidia.so.0:
     symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libGLX_nvidia.so.0
-
 apps:
   dolphin-emu:
     command: bin/desktop-launch $SNAP/usr/local/bin/dolphin-emu
     desktop: usr/local/share/applications/dolphin-emu.desktop
     environment:
-      HOME: "$SNAP_USER_COMMON"
-      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
+      HOME: $SNAP_USER_COMMON
+      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
       KDE_FORK_SLAVES: 1
       DISABLE_WAYLAND: 1
-      # KF5_LIBEXEC_DIR: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5"
-      PATH: "$PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5" # Allows kioslave5 to be found, above commented env variable doesn't work for some reason  
+      PATH: $PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5
     plugs:
-      - desktop
-      - desktop-legacy
-      - x11
-      - wayland
-      - pulseaudio
-      - opengl
-      - joystick
-      - unity7
-      - network
-      - network-bind
-      - home
-      - removable-media
-      - gsettings
-      - hardware-observe
-      - mount-observe
-      - bluetooth-control
-      # - bluez
+    - desktop
+    - desktop-legacy
+    - x11
+    - wayland
+    - pulseaudio
+    - opengl
+    - joystick
+    - unity7
+    - network
+    - network-bind
+    - home
+    - removable-media
+    - gsettings
+    - hardware-observe
+    - mount-observe
+    - bluetooth-control
   dolphin-emu-nogui:
     command: usr/local/bin/dolphin-emu-nogui
     environment:
-      HOME: "$SNAP_USER_COMMON"
-      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
+      HOME: $SNAP_USER_COMMON
+      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
       DISABLE_WAYLAND: 1
     plugs:
-      - desktop
-      - desktop-legacy
-      - x11
-      - wayland
-      - pulseaudio
-      - opengl
-      - joystick
-      - unity7
-      - network
-      - home
-      - removable-media
-      - gsettings
-      - hardware-observe
-      - mount-observe
-
-      
+    - desktop
+    - desktop-legacy
+    - x11
+    - wayland
+    - pulseaudio
+    - opengl
+    - joystick
+    - unity7
+    - network
+    - home
+    - removable-media
+    - gsettings
+    - hardware-observe
+    - mount-observe
