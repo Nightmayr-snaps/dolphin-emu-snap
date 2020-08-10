@@ -88,6 +88,7 @@ parts:
       usr/local/share/dolphin-emu/sys: usr/local/bin/Sys
     after:
     - patches
+    - desktop-qt5
   desktop-qt5:
     build-packages:
     - build-essential
@@ -134,20 +135,6 @@ parts:
     source-type: local
     prime:
     - -*
-  cleanup:
-    after:
-    - dolphin-emu
-    - patches
-    - plasma-integration
-    - desktop-qt5
-    plugin: nil
-    build-snaps:
-    - core18
-    override-prime: |
-      set -eux
-      for snap in "core18"; do  # List all content-snaps and base snaps you're using here
-        cd "/snap/$snap/current" && find . -type f,l -exec rm -f "$SNAPCRAFT_PRIME/{}" \;
-      done
 plugs:
   gtk-3-themes:
     interface: content
