@@ -1,4 +1,14 @@
 #!/bin/bash
+
+# ensure_dir_exists calls `mkdir -p` if the given path is not a directory.
+# This speeds up execution time by avoiding unnecessary calls to mkdir.
+#
+# Usage: ensure_dir_exists <path> [<mkdir-options>]...
+#
+function ensure_dir_exists() {
+  [ -d "$1" ] ||  mkdir -p "$@"
+}
+
 if [ ! -z "$KDE_FULL_SESSION" ]; then
   unset KDE_FULL_SESSION
 fi
@@ -9,7 +19,12 @@ else
   export QT_QPA_PLATFORMTHEME=gtk3
 fi
 
-# unset FONTCONFIG_FILE 
-# unset FONTCONFIG_PATH
+export XDG_CONFIG_HOME=$SNAP_USER_COMMON/.config
+ensure_dir_exists $XDG_CONFIG_HOME -m 700
+export XDG_DATA_HOME=$SNAP_USER_COMMON/.local/share
+ensure_dir_exists $XDG_DATA_HOME
+export XDG_CACHE_HOME=$SNAP_USER_COMMON/.cache
+ensure_dir_exists $XDG_CACHE_HOME
+
 
 exec "${@}"
