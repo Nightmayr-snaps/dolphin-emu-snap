@@ -24,7 +24,7 @@ jobs:
         sudo pip3 install -r ./.github/scripts/requirements.txt
     - name: Check latest version
       run: |
-        python3 ./.github/scripts/version.py edge
+        python3 ./.github/scripts/version.py development
         echo ::set-env name=BUILD::$(cat build)
       id: version-check
     - name: Already latest versions - cancelling
