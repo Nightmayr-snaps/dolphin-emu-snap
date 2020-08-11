@@ -1,75 +1,74 @@
 name: dolphin-emulator
 base: core18
-version: '5.0-edge'
+version: 5.0-12436
 summary: A Wii/GameCube Emulator
-description: |
-  Dolphin is an emulator for two recent Nintendo video game consoles: the GameCube and the Wii. 
-  It allows PC gamers to enjoy games for these two consoles in full HD (1080p) with 
-  several enhancements: compatibility with all PC controllers, turbo speed, networked multiplayer, and even more.
+description: "Dolphin is an emulator for two recent Nintendo video game consoles:\
+  \ the GameCube and the Wii. \nIt allows PC gamers to enjoy games for these two consoles\
+  \ in full HD (1080p) with \nseveral enhancements: compatibility with all PC controllers,\
+  \ turbo speed, networked multiplayer, and even more.\n"
 license: GPL-2.0
 icon: snap/gui/dolphin-emu.png
 grade: stable
 confinement: strict
 architectures:
-  - build-on: amd64
+- build-on: amd64
 parts:
   dolphin-emu:
     plugin: cmake
     configflags:
-    - "-DCMAKE_BUILD_TYPE=Release"
-    - "-DCMAKE_INSTALL_PREFIX=/usr/local"
-    - "-DLINUX_LOCAL_DEV=TRUE"
-    - "-DENABLE_SDL=ON"
+    - -DCMAKE_BUILD_TYPE=Release
+    - -DCMAKE_INSTALL_PREFIX=/usr/local
+    - -DLINUX_LOCAL_DEV=TRUE
+    - -DENABLE_SDL=ON
     source: https://github.com/dolphin-emu/dolphin.git
-    source-commit: 655e92478a0b4366e9f38bdb5c33375a5ef40b6e
+    source-commit: 07a0d44b36c487967cbd957ed9bd20384bf3e33a
     build-snaps:
-      - kde-frameworks-5-core18
-      - kde-frameworks-5-core18-sdk
+    - kde-frameworks-5-core18
+    - kde-frameworks-5-core18-sdk
     build-packages:
-      - ffmpeg 
-      - libavcodec-dev
-      - libevdev-dev
-      - libusb-1.0-0-dev
-      - libavformat-dev
-      - libswscale-dev
-      - libsfml-dev
-      - libminiupnpc-dev
-      - libmbedtls-dev
-      - libhidapi-dev
-      - libpangocairo-1.0-0
-      - libgtk2.0-dev
-      - libbluetooth-dev
-      - libudev-dev
-      - libpulse-dev
-      - libsdl2-dev
+    - ffmpeg
+    - libavcodec-dev
+    - libevdev-dev
+    - libusb-1.0-0-dev
+    - libavformat-dev
+    - libswscale-dev
+    - libsfml-dev
+    - libminiupnpc-dev
+    - libmbedtls-dev
+    - libhidapi-dev
+    - libpangocairo-1.0-0
+    - libgtk2.0-dev
+    - libbluetooth-dev
+    - libudev-dev
+    - libpulse-dev
+    - libsdl2-dev
     stage-packages:
-      - libusb-1.0-0
-      - ffmpeg
-      - libavcodec57
-      - libhidapi-dev
-      - libsfml-audio2.4
-      - libsfml-graphics2.4
-      - libsfml-network2.4
-      - libsfml-system2.4
-      - libsfml-window2.4
-      - libmbedtls10
-      - libminiupnpc10
-      - libavformat57
-      - libbluetooth3
-      # Are all the below needed?
-      - libgl1-mesa-dri
-      - libxcb-xinerama0
-      - libxinerama1
-      - libswscale4
-      - libpangocairo-1.0-0
-      - libudev1
-      - libvulkan1
-      - libasound2
-      - mesa-vulkan-drivers
-      - nvidia-driver-440 # seems to fix nvidia vulkan at the cost of adding 100MB+ to final package, may be able to cleanup unecessary files?
-      - vulkan-utils
-      - libbluray2
-      - xdg-utils
+    - libusb-1.0-0
+    - ffmpeg
+    - libavcodec57
+    - libhidapi-dev
+    - libsfml-audio2.4
+    - libsfml-graphics2.4
+    - libsfml-network2.4
+    - libsfml-system2.4
+    - libsfml-window2.4
+    - libmbedtls10
+    - libminiupnpc10
+    - libavformat57
+    - libbluetooth3
+    - libgl1-mesa-dri
+    - libxcb-xinerama0
+    - libxinerama1
+    - libswscale4
+    - libpangocairo-1.0-0
+    - libudev1
+    - libvulkan1
+    - libasound2
+    - mesa-vulkan-drivers
+    - nvidia-driver-440
+    - vulkan-utils
+    - libbluray2
+    - xdg-utils
     override-pull: |
       snapcraftctl pull
       git apply $SNAPCRAFT_STAGE/sharedmemory.patch
@@ -80,12 +79,11 @@ parts:
       sed -i 's|Icon=dolphin-emu|Icon=/usr/local/share/icons/hicolor/scalable/apps/dolphin-emu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
       sed -i 's|Exec=env QT_QPA_PLATFORM=xcb dolphin-emu|Exec=dolphin-emu|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
     stage:
-      - -usr/share/doc
-    organize: 
-        #Copy Sys folder to the Binaries folder
-        usr/local/share/dolphin-emu/sys: usr/local/bin/Sys
+    - -usr/share/doc
+    organize:
+      usr/local/share/dolphin-emu/sys: usr/local/bin/Sys
     after:
-      - patches
+    - patches
   launchers:
     plugin: dump
     source: snap/local/launchers
@@ -97,22 +95,21 @@ parts:
     source: snap/local/patches
     source-type: local
     prime:
-      - -*
-# The following parts add qgnomeplatform and dependencies to fix application theming problems
+    - -*
   qgnomeplatform:
     source: https://github.com/FedoraQt/QGnomePlatform.git
     source-depth: 1
     source-tag: 0.6.0
     plugin: dump
     build-snaps:
-      - kde-frameworks-5-core18-sdk
-      - kde-frameworks-5-core18
+    - kde-frameworks-5-core18-sdk
+    - kde-frameworks-5-core18
     build-packages:
-      - libglvnd-dev
-      - libgtk-3-dev
+    - libglvnd-dev
+    - libgtk-3-dev
     stage-packages:
-      - libgtk-3-0
-      - cinnamon-desktop-data
+    - libgtk-3-0
+    - cinnamon-desktop-data
     override-build: |
       KF5_DIR=/snap/kde-frameworks-5-core18-sdk/current
       $KF5_DIR/usr/lib/qt5/bin/qmake -qtconf "$SNAPCRAFT_STAGE/qt.conf"
@@ -121,10 +118,10 @@ parts:
       cp -a "$SNAPCRAFT_PART_INSTALL/tmp/$KF5_DIR/." "$SNAPCRAFT_PART_INSTALL"
       rm -r "$SNAPCRAFT_PART_INSTALL/tmp"
     stage:
-      - -usr/share/doc
+    - -usr/share/doc
     after:
-      - qtconf
-      - qtwayland
+    - qtconf
+    - qtwayland
   qtconf:
     plugin: nil
     override-build: |
@@ -157,23 +154,22 @@ parts:
       Translations=share/qt5/translations
       EOF
     stage:
-      - -usr/lib/x86_64-linux-gnu/qt5/plugins/platforms/libqwayland*
-      - -usr/lib/x86_64-linux-gnu/qt5/plugins/wayland*
-      - -usr/lib/x86_64-linux-gnu/qt5/qml/QtWayland
-      - -usr/share/doc
-      # - -usr/include/x86_64-linux-gnu/qt5/QtWaylandClient/5.14.1/QtWaylandClient/private/qtwaylandclient-config_p.h
-      # - -usr/include/x86_64-linux-gnu/qt5/QtWaylandCompositor/5.14.1/QtWaylandCompositor/private/qtwaylandcompositor-config_p.h
-    prime: [-./*]
+    - -usr/lib/x86_64-linux-gnu/qt5/plugins/platforms/libqwayland*
+    - -usr/lib/x86_64-linux-gnu/qt5/plugins/wayland*
+    - -usr/lib/x86_64-linux-gnu/qt5/qml/QtWayland
+    - -usr/share/doc
+    prime:
+    - -./*
   qtimageformats:
     source: https://github.com/qt/qtimageformats.git
     source-depth: 1
     source-tag: v5.12.3
     plugin: dump
     build-snaps:
-      - kde-frameworks-5-core18-sdk
-      - kde-frameworks-5-core18
+    - kde-frameworks-5-core18-sdk
+    - kde-frameworks-5-core18
     build-packages:
-      - libglvnd-dev
+    - libglvnd-dev
     override-build: |
       KF5_DIR=/snap/kde-frameworks-5-core18-sdk/current
       $KF5_DIR/usr/lib/qt5/bin/qmake -qtconf "$SNAPCRAFT_STAGE/qt.conf"
@@ -182,19 +178,19 @@ parts:
       cp -a "$SNAPCRAFT_PART_INSTALL/tmp/$KF5_DIR/." "$SNAPCRAFT_PART_INSTALL"
       rm -r "$SNAPCRAFT_PART_INSTALL/tmp"
     stage:
-      - -usr/share/doc
+    - -usr/share/doc
     after:
-      - qtconf
+    - qtconf
   qtwayland:
     source: https://github.com/qt/qtwayland.git
     source-depth: 1
     source-tag: v5.12.3
     plugin: dump
     build-snaps:
-      - kde-frameworks-5-core18-sdk
-      - kde-frameworks-5-core18
+    - kde-frameworks-5-core18-sdk
+    - kde-frameworks-5-core18
     build-packages:
-      - libglvnd-dev
+    - libglvnd-dev
     override-build: |
       KF5_DIR=/snap/kde-frameworks-5-core18-sdk/current
       $KF5_DIR/usr/lib/qt5/bin/qmake -qtconf "$SNAPCRAFT_STAGE/qt.conf"
@@ -204,37 +200,30 @@ parts:
       cp -a "$SNAPCRAFT_PART_INSTALL/tmp/$SNAPCRAFT_STAGE/." "$SNAPCRAFT_PART_INSTALL"
       rm -r "$SNAPCRAFT_PART_INSTALL/tmp"
     stage:
-      - -usr/share/doc
+    - -usr/share/doc
     after:
-      - qtconf
-    prime: [-./*]
-  # This part removes all the files in this snap which already exist in
-  # connected content and base snaps. Since these files will be available
-  # at runtime from the content and base snaps, they do not need to be
-  # included in this snap itself.
-  #
-  # More info: https://snapcraft-utils-library.readthedocs.io/en/latest/lib/cleanup.html 
-  #
+    - qtconf
+    prime:
+    - -./*
   cleanup:
-    after:  # Make this part run last; list all your other parts here
-      - dolphin-emu
-      - patches
-      - launchers
-      - qtwayland
-      - qtimageformats
-      - qgnomeplatform
-      - qtconf
+    after:
+    - dolphin-emu
+    - patches
+    - launchers
+    - qtwayland
+    - qtimageformats
+    - qgnomeplatform
+    - qtconf
     plugin: nil
-    build-snaps:  # List all content-snaps and base snaps you're using here
-      - core18
-      - kde-frameworks-5-core18
-      - kde-frameworks-5-core18-sdk
+    build-snaps:
+    - core18
+    - kde-frameworks-5-core18
+    - kde-frameworks-5-core18-sdk
     override-prime: |
       set -eux
       for snap in "core18" "kde-frameworks-5-core18" "kde-frameworks-5-core18-sdk"; do  # List all content-snaps and base snaps you're using here
         cd "/snap/$snap/current" && find . -type f,l -exec rm -f "$SNAPCRAFT_PRIME/{}" \;
       done
-
 plugs:
   gtk-3-themes:
     interface: content
@@ -248,12 +237,6 @@ plugs:
     interface: content
     target: $SNAP/data-dir/sounds
     default-provider: gtk-common-themes
-  # kde-frameworks-5-plug:
-  #   content: kde-frameworks-5-core18-all
-  #   default-provider: kde-frameworks-5-core18
-  #   interface: content
-  #   target: $SNAP/kf5
-
 layout:
   /usr/share/vulkan:
     symlink: $SNAP/usr/share/vulkan
@@ -263,60 +246,55 @@ layout:
     symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so
   /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libGLX_nvidia.so.0:
     symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libGLX_nvidia.so.0
-
 apps:
   dolphin-emu:
     extensions:
-      - kde-neon
+    - kde-neon
     command: usr/local/bin/dolphin-emu
     command-chain:
-      # - snap/command-chain/desktop-launch
-      - bin/dolphin-launch
+    - bin/dolphin-launch
     desktop: usr/local/share/applications/dolphin-emu.desktop
     environment:
-      HOME: "$SNAP_USER_COMMON"
-      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
+      HOME: $SNAP_USER_COMMON
+      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
       KDE_FORK_SLAVES: 1
       DISABLE_WAYLAND: 1
     plugs:
-      - kde-frameworks-5-plug
-      - desktop
-      - desktop-legacy
-      - x11
-      - wayland
-      - audio-playback
-      - opengl
-      - joystick
-      - unity7
-      - network
-      - network-bind
-      - home
-      - removable-media
-      - gsettings
-      - hardware-observe
-      - mount-observe
-      - bluetooth-control
-      # - bluez
+    - kde-frameworks-5-plug
+    - desktop
+    - desktop-legacy
+    - x11
+    - wayland
+    - audio-playback
+    - opengl
+    - joystick
+    - unity7
+    - network
+    - network-bind
+    - home
+    - removable-media
+    - gsettings
+    - hardware-observe
+    - mount-observe
+    - bluetooth-control
   dolphin-emu-nogui:
     command: usr/local/bin/dolphin-emu-nogui
     environment:
-      HOME: "$SNAP_USER_COMMON"
-      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
+      HOME: $SNAP_USER_COMMON
+      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
       DISABLE_WAYLAND: 1
     plugs:
-      - desktop
-      - desktop-legacy
-      - x11
-      - wayland
-      - audio-playback
-      - opengl
-      - joystick
-      - unity7
-      - network
-      - home
-      - removable-media
-      - gsettings
-      - hardware-observe
-      - mount-observe
-
-
+    - desktop
+    - desktop-legacy
+    - x11
+    - wayland
+    - audio-playback
+    - opengl
+    - joystick
+    - unity7
+    - network
+    - home
+    - removable-media
+    - gsettings
+    - hardware-observe
+    - mount-observe
