@@ -19,11 +19,12 @@ jobs:
     - name: Install python3 and pip modules
       run: |
         sudo apt install python3 -y
-        sudp apt install python3-pip -y
-        sudo pip3 install ./.github/scripts/requirements.txt
+        sudo apt install python3-pip -y
+        sudo apt install python3-setuptools -y
+        sudo pip3 install -r ./.github/scripts/requirements.txt
     - name: Check latest version
       run: |
-        ./.github/scripts/version.py
+        python3 ./.github/scripts/version.py edge
         echo ::set-env name=BUILD::$(cat build)
       id: version-check
     - name: Already latest versions - cancelling
