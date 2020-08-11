@@ -63,7 +63,6 @@ parts:
       - libswscale4
       - libpangocairo-1.0-0
       - libudev1
-      - libcanberra-gtk-module
       - libvulkan1
       - libasound2
       - mesa-vulkan-drivers
@@ -80,6 +79,8 @@ parts:
       snapcraftctl build
       sed -i 's|Icon=dolphin-emu|Icon=/usr/local/share/icons/hicolor/scalable/apps/dolphin-emu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
       sed -i 's|Exec=env QT_QPA_PLATFORM=xcb dolphin-emu|Exec=dolphin-emu|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
+    stage:
+      - -usr/share/doc
     organize: 
         #Copy Sys folder to the Binaries folder
         usr/local/share/dolphin-emu/sys: usr/local/bin/Sys
@@ -119,6 +120,8 @@ parts:
       make INSTALL_ROOT="$SNAPCRAFT_PART_INSTALL/tmp" install
       cp -a "$SNAPCRAFT_PART_INSTALL/tmp/$KF5_DIR/." "$SNAPCRAFT_PART_INSTALL"
       rm -r "$SNAPCRAFT_PART_INSTALL/tmp"
+    stage:
+      - -usr/share/doc
     after:
       - qtconf
       - qtwayland
@@ -157,6 +160,7 @@ parts:
       - -usr/lib/x86_64-linux-gnu/qt5/plugins/platforms/libqwayland*
       - -usr/lib/x86_64-linux-gnu/qt5/plugins/wayland*
       - -usr/lib/x86_64-linux-gnu/qt5/qml/QtWayland
+      - -usr/share/doc
       # - -usr/include/x86_64-linux-gnu/qt5/QtWaylandClient/5.14.1/QtWaylandClient/private/qtwaylandclient-config_p.h
       # - -usr/include/x86_64-linux-gnu/qt5/QtWaylandCompositor/5.14.1/QtWaylandCompositor/private/qtwaylandcompositor-config_p.h
     prime: [-./*]
@@ -177,6 +181,8 @@ parts:
       make INSTALL_ROOT="$SNAPCRAFT_PART_INSTALL/tmp" install
       cp -a "$SNAPCRAFT_PART_INSTALL/tmp/$KF5_DIR/." "$SNAPCRAFT_PART_INSTALL"
       rm -r "$SNAPCRAFT_PART_INSTALL/tmp"
+    stage:
+      - -usr/share/doc
     after:
       - qtconf
   qtwayland:
@@ -197,6 +203,8 @@ parts:
       cp -a "$SNAPCRAFT_PART_INSTALL/tmp/$KF5_DIR/." "$SNAPCRAFT_PART_INSTALL"
       cp -a "$SNAPCRAFT_PART_INSTALL/tmp/$SNAPCRAFT_STAGE/." "$SNAPCRAFT_PART_INSTALL"
       rm -r "$SNAPCRAFT_PART_INSTALL/tmp"
+    stage:
+      - -usr/share/doc
     after:
       - qtconf
     prime: [-./*]
