@@ -65,6 +65,7 @@ parts:
       - libudev1
       - libcanberra-gtk-module
       - libvulkan1
+      - libasound2
       - mesa-vulkan-drivers
       - nvidia-driver-440 # seems to fix nvidia vulkan at the cost of adding 100MB+ to final package, may be able to cleanup unecessary files?
       - vulkan-utils
