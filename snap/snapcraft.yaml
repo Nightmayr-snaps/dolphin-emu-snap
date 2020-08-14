@@ -1,6 +1,6 @@
 name: dolphin-emulator
 base: core20
-version: 5.0-12247
+version: 5.0-12246
 summary: A Wii/GameCube Emulator
 description: "Dolphin is an emulator for two recent Nintendo video game consoles:\
   \ the GameCube and the Wii. \nIt allows PC gamers to enjoy games for these two consoles\
@@ -64,7 +64,6 @@ parts:
     - libsdl2-2.0-0
     - libopengl0
     - libudev1
-    - libcanberra-gtk-module
     - libvulkan1
     - mesa-vulkan-drivers
     - nvidia-driver-440
