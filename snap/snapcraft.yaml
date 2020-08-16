@@ -276,7 +276,7 @@ apps:
     - gsettings
     - hardware-observe
     - mount-observe
-    - bluetooth-control
+    - bluez
   dolphin-emu-nogui:
     command: usr/local/bin/dolphin-emu-nogui
     environment:
@@ -298,3 +298,4 @@ apps:
     - gsettings
     - hardware-observe
     - mount-observe
+    - bluez
