@@ -15,7 +15,6 @@ architectures:
 parts:
   dolphin-emu:
     plugin: cmake
-    # cmake-parameters:
     configflags:
     - "-DCMAKE_BUILD_TYPE=Release"
     - "-DCMAKE_INSTALL_PREFIX=/usr/local"
@@ -115,7 +114,6 @@ parts:
       - libxinerama1
       - libpangocairo-1.0-0
       - libudev1
-      - libcanberra-gtk-module
       - libbluray1
       - xdg-utils
       - freeglut3
@@ -173,10 +171,8 @@ parts:
     plugin: nil
     build-snaps:  # List all content-snaps and base snaps you're using here
       - core
-      # - kde-frameworks-5-core18
     override-prime: |
       set -eux
-      # for snap in "core18" "kde-frameworks-5-core18" "kde-frameworks-5-core18-sdk"; do  # List all content-snaps and base snaps you're using here
       for snap in "core"; do  # List all content-snaps and base snaps you're using here
         cd "/snap/$snap/current" && find . -type f -exec rm -f "$SNAPCRAFT_PRIME/{}" \;
       done
@@ -216,10 +212,7 @@ apps:
     environment:
       HOME: "$SNAP_USER_COMMON"
       LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
-      KDE_FORK_SLAVES: 1
       DISABLE_WAYLAND: 1
-      # KF5_LIBEXEC_DIR: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5"
-      PATH: "$PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5" # Allows kioslave5 to be found, above commented env variable doesn't work for some reason  
     plugs:
       - desktop
       - desktop-legacy
@@ -236,8 +229,7 @@ apps:
       - gsettings
       - hardware-observe
       - mount-observe
-      - bluetooth-control
-      # - bluez
+      - bluez
   dolphin-emu-nogui:
     command: usr/local/bin/dolphin-emu-nogui
     environment:
@@ -259,5 +251,6 @@ apps:
       - gsettings
       - hardware-observe
       - mount-observe
+      - bluez
 
 
