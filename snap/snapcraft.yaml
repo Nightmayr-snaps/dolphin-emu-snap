@@ -41,9 +41,6 @@ parts:
       - libpangocairo-1.0-0
       - libgtk2.0-dev
       - libbluetooth-dev
-      - qt5-default
-      - qtbase5-private-dev
-      - qtbase5-dev
       - libudev-dev
     # Stage packages for core18
     # stage-packages:
@@ -107,12 +104,7 @@ parts:
       - libevdev2
       - libglu1-mesa
       - libsdl2-2.0-0
-      - liburi-encode-perl
-      # Are all the below needed?
       - libgl1-mesa-dri
-      - libxcb-xinerama0
-      - libxinerama1
-      - libpangocairo-1.0-0
       - libudev1
       - libbluray1
       - xdg-utils
