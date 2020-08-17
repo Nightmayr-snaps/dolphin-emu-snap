@@ -257,10 +257,8 @@ apps:
     environment:
       HOME: $SNAP_USER_COMMON
       LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
-      KDE_FORK_SLAVES: 1
       DISABLE_WAYLAND: 1
     plugs:
-    - kde-frameworks-5-plug
     - desktop
     - desktop-legacy
     - x11
@@ -276,7 +274,7 @@ apps:
     - gsettings
     - hardware-observe
     - mount-observe
-    - bluetooth-control
+    - bluez
   dolphin-emu-nogui:
     command: usr/local/bin/dolphin-emu-nogui
     environment:
@@ -298,3 +296,4 @@ apps:
     - gsettings
     - hardware-observe
     - mount-observe
+    - bluez
