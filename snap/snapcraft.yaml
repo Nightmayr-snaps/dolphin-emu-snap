@@ -3,9 +3,15 @@ base: core
 version: '5.0'
 summary: A Wii/GameCube Emulator
 description: |
-  Dolphin is an emulator for two recent Nintendo video game consoles: the GameCube and the Wii. 
-  It allows PC gamers to enjoy games for these two consoles in full HD (1080p) with 
-  several enhancements: compatibility with all PC controllers, turbo speed, networked multiplayer, and even more.
+  Dolphin is an emulator for two recent Nintendo video game consoles: the GameCube and the Wii.
+  It allows PC gamers to enjoy games for these two consoles in full HD (1080p) with
+  several enhancements: compatibility with all PC controllers, turbo speed, networked multiplayer,
+  and even more.
+  
+  This snap is not necessarily endorsed or officially maintained by the upstream developers.
+  
+  Upstream Project: https://dolphin-emu.org/ snapcraft.yaml Build Definition:
+  https://github.com/Nightmayr-snaps/dolphin-snap
 license: GPL-2.0
 icon: snap/gui/dolphin-emu.png
 grade: stable
