@@ -1,6 +1,6 @@
 name: dolphin-emulator
 base: core20
-version: 5.0-12247
+version: 5.0-12246
 summary: A Wii/GameCube Emulator
 description: "Dolphin is an emulator for two recent Nintendo video game consoles:\
   \ the GameCube and the Wii. \nIt allows PC gamers to enjoy games for these two consoles\
@@ -182,7 +182,7 @@ apps:
     - gsettings
     - hardware-observe
     - mount-observe
-    - bluetooth-control
+    - bluez
   dolphin-emu-nogui:
     command: usr/local/bin/dolphin-emu-nogui
     environment:
@@ -204,3 +204,4 @@ apps:
     - gsettings
     - hardware-observe
     - mount-observe
+    - bluez
