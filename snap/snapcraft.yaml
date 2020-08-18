@@ -91,7 +91,8 @@ parts:
       - libusb-1.0-0
       - ffmpeg
       - libavcodec-ffmpeg56
-      - libhidapi-dev
+      - libhidapi-hidraw0
+      - libhidapi-libusb0
       - libsfml-audio2.3v5
       - libsfml-graphics2.3v5
       - libsfml-network2.3v5
@@ -228,6 +229,7 @@ apps:
       - hardware-observe
       - mount-observe
       - bluez
+      - optical-drive
   dolphin-emu-nogui:
     command: usr/local/bin/dolphin-emu-nogui
     environment:
@@ -235,8 +237,6 @@ apps:
       LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
       DISABLE_WAYLAND: 1
     plugs:
-      - desktop
-      - desktop-legacy
       - x11
       - wayland
       - audio-playback
@@ -250,5 +250,6 @@ apps:
       - hardware-observe
       - mount-observe
       - bluez
+      - optical-drive
 
 
