@@ -1,6 +1,6 @@
 name: dolphin-emulator
 base: core20
-version: 5.0-12247
+version: 5.0-12246
 summary: A Wii/GameCube Emulator
 description: "Dolphin is an emulator for two recent Nintendo video game consoles:\
   \ the GameCube and the Wii. \nIt allows PC gamers to enjoy games for these two consoles\
@@ -35,7 +35,6 @@ parts:
     - libmbedtls-dev
     - libhidapi-dev
     - libpangocairo-1.0-0
-    - libgtk2.0-dev
     - libbluetooth-dev
     - libudev-dev
     - libpulse-dev
@@ -57,7 +56,6 @@ parts:
     - libswscale5
     - libbluetooth3
     - libpulse0
-    - libgtk2.0-0
     - libslang2
     - libevdev2
     - libglu1-mesa
@@ -72,9 +70,6 @@ parts:
     - xdg-utils
     - freeglut3
     - libgl1-mesa-dri
-    - libxcb-xinerama0
-    - libxinerama1
-    - libpangocairo-1.0-0
     override-pull: |
       snapcraftctl pull
       git apply $SNAPCRAFT_STAGE/sharedmemory.patch
@@ -183,6 +178,7 @@ apps:
     - hardware-observe
     - mount-observe
     - bluez
+    - optical-drive
   dolphin-emu-nogui:
     command: usr/local/bin/dolphin-emu-nogui
     environment:
@@ -190,8 +186,6 @@ apps:
       LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
       DISABLE_WAYLAND: 1
     plugs:
-    - desktop
-    - desktop-legacy
     - x11
     - wayland
     - audio-playback
@@ -205,3 +199,4 @@ apps:
     - hardware-observe
     - mount-observe
     - bluez
+    - optical-drive
