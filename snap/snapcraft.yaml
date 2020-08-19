@@ -1,6 +1,6 @@
 name: dolphin-emulator
 base: core18
-version: 5.0-12459
+version: 5.0-12458
 summary: A Wii/GameCube Emulator
 description: "Dolphin is an emulator for two recent Nintendo video game consoles:\
   \ the GameCube and the Wii. \nIt allows PC gamers to enjoy games for these two consoles\
@@ -46,7 +46,8 @@ parts:
     - libusb-1.0-0
     - ffmpeg
     - libavcodec57
-    - libhidapi-dev
+    - libhidapi-hidraw0
+    - libhidapi-libusb0
     - libsfml-audio2.4
     - libsfml-graphics2.4
     - libsfml-network2.4
@@ -57,10 +58,7 @@ parts:
     - libavformat57
     - libbluetooth3
     - libgl1-mesa-dri
-    - libxcb-xinerama0
-    - libxinerama1
     - libswscale4
-    - libpangocairo-1.0-0
     - libudev1
     - libvulkan1
     - libasound2
@@ -275,6 +273,7 @@ apps:
     - hardware-observe
     - mount-observe
     - bluez
+    - optical-drive
   dolphin-emu-nogui:
     command: usr/local/bin/dolphin-emu-nogui
     environment:
@@ -282,8 +281,6 @@ apps:
       LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
       DISABLE_WAYLAND: 1
     plugs:
-    - desktop
-    - desktop-legacy
     - x11
     - wayland
     - audio-playback
@@ -297,3 +294,5 @@ apps:
     - hardware-observe
     - mount-observe
     - bluez
+    - optical-drive
+    
