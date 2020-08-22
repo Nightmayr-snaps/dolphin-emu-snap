@@ -1,3 +1,4 @@
 *.snap
 build
 exported.txt
+.vscode
