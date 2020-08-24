@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # ensure_dir_exists calls `mkdir -p` if the given path is not a directory.
 # This speeds up execution time by avoiding unnecessary calls to mkdir.
 #
@@ -9,16 +8,6 @@ function ensure_dir_exists() {
   [ -d "$1" ] ||  mkdir -p "$@"
 }
 
-if [ ! -z "$KDE_FULL_SESSION" ]; then
-  unset KDE_FULL_SESSION
-fi
-
-if echo "$XDG_CURRENT_DESKTOP" | grep -q KDE; then
-  unset XDG_CURRENT_DESKTOP
-else
-  export QT_QPA_PLATFORMTHEME=gtk3
-fi
-
 export XDG_CONFIG_HOME=$SNAP_USER_COMMON/.config
 ensure_dir_exists $XDG_CONFIG_HOME -m 700
 export XDG_DATA_HOME=$SNAP_USER_COMMON/.local/share
@@ -26,5 +15,20 @@ ensure_dir_exists $XDG_DATA_HOME
 export XDG_CACHE_HOME=$SNAP_USER_COMMON/.cache
 ensure_dir_exists $XDG_CACHE_HOME
 
+# Fix gdk-pixbuf-loaders.cache file until kde-frameworks-5 content snap includes gdk-pixbuf SVG module
+# use the svg module present in the snap itself
+# see discussion here: https://forum.snapcraft.io/t/broken-theming-and-missing-icons-on-gtk-file-picker-using-kde-neon-extension/18937
+if ! grep -q "libpixbufloader-svg.so" $XDG_CACHE_HOME/gdk-pixbuf-loaders.cache; then
+cat << EOF >> $XDG_CACHE_HOME/gdk-pixbuf-loaders.cache
+"$SNAP/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-svg.so"
+"svg" 6 "gdk-pixbuf" "Scalable Vector Graphics" "LGPL"
+"image/svg+xml" "image/svg" "image/svg-xml" "image/vnd.adobe.svg+xml" "text/xml-svg" "image/svg+xml-compressed" ""
+"svg" "svgz" "svg.gz" ""
+" <svg" "*    " 100
+" <!DOCTYPE svg" "*             " 100
+
+
+EOF
+fi
 
 exec "${@}"
