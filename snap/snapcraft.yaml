@@ -1,6 +1,6 @@
 name: dolphin-emulator
 base: core18
-version: 5.0-12711
+version: 5.0-12710
 summary: A Wii/GameCube Emulator
 description: "Dolphin is an emulator for two recent Nintendo video game consoles:\
   \ the GameCube and the Wii. \nIt allows PC gamers to enjoy games for these two consoles\
@@ -63,7 +63,6 @@ parts:
     - libvulkan1
     - libasound2
     - mesa-vulkan-drivers
-    - nvidia-driver-440
     - vulkan-utils
     - libbluray2
     - xdg-utils
@@ -255,6 +254,7 @@ apps:
     environment:
       HOME: $SNAP_USER_COMMON
       LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
+      VK_ICD_FILENAMES: "/var/lib/snapd/lib/vulkan/icd.d/nvidia_icd.json:$SNAP/usr/share/vulkan/icd.d/radeon.x86_64.json:$SNAP/usr/share/vulkan/icd.d/intel_icd.x86_64.json"
       DISABLE_WAYLAND: 1
     plugs:
     - desktop
