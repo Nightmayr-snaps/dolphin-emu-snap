@@ -250,11 +250,11 @@ apps:
     command: usr/local/bin/dolphin-emu
     command-chain:
     - bin/dolphin-launch
+    - bin/vulkan-icd-files
     desktop: usr/local/share/applications/dolphin-emu.desktop
     environment:
       HOME: $SNAP_USER_COMMON
       LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
-      VK_ICD_FILENAMES: /var/lib/snapd/lib/vulkan/icd.d/nvidia_icd.json:$SNAP/usr/share/vulkan/icd.d/radeon.x86_64.json:$SNAP/usr/share/vulkan/icd.d/intel_icd.x86_64.json
       DISABLE_WAYLAND: 1
     plugs:
     - desktop

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#Path to Vulkan ICD files depending on CPU architecture
+case $SNAP_ARCH in
+  amd64)
+    VK_ARCH="x86_64"
+    export VK_ICD_FILENAMES=/var/lib/snapd/lib/vulkan/icd.d/nvidia_icd.json:$SNAP/usr/share/vulkan/icd.d/radeon.$VK_ARCH.json:$SNAP/usr/share/vulkan/icd.d/intel_icd.$VK_ARCH.json
+    ;;
+  arm64)
+    VK_ARCH="aarch64"
+    export VK_ICD_FILENAMES=/var/lib/snapd/lib/vulkan/icd.d/nvidia_icd.json:$SNAP/usr/share/vulkan/icd.d/radeon.$VK_ARCH.json
+    ;;
+  i386)
+    VK_ARCH="i686"
+    export VK_ICD_FILENAMES=/var/lib/snapd/lib/vulkan/icd.d/nvidia_icd.json:$SNAP/usr/share/vulkan/icd.d/radeon.$VK_ARCH.json:$SNAP/usr/share/vulkan/icd.d/intel_icd.$VK_ARCH.json
+    ;;
+  armhf)
+    VK_ARCH="arm"
+    export VK_ICD_FILENAMES=/var/lib/snapd/lib/vulkan/icd.d/nvidia_icd.json:$SNAP/usr/share/vulkan/icd.d/radeon.$VK_ARCH.json
+    ;;
+esac
+
+exec "${@}"
