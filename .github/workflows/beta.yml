@@ -25,7 +25,7 @@ jobs:
     - name: Check latest version
       run: |
         python3 ./.github/scripts/version.py beta
-        echo ::set-env name=BUILD::$(cat build)
+        echo "BUILD=$(cat build)" >> $GITHUB_ENV
       id: version-check
     - name: Already latest versions - cancelling
       if: env.BUILD == 'false'

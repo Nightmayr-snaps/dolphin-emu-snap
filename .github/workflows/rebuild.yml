@@ -1,0 +1,34 @@
+name: Rebuild Snap
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: 'Snap channel to rebuild'     
+        required: true
+        default: 'stable'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      if: ${{ github.event.inputs.channel }} == 'stable'
+      with:
+        token: ${{ secrets.PAT }}
+    - uses: actions/checkout@v2
+      if: ${{ github.event.inputs.channel }} != 'stable'
+      with:
+        token: ${{ secrets.PAT }}
+        ref: ${{ github.event.inputs.channel }}
+    - uses: snapcore/action-build@v1
+      id: snapcraft
+    - name: Testing snap
+      run: |
+        sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
+        snap run yuzu.yuzu-cmd --version
+    - uses: snapcore/action-publish@v1
+      with:
+        store_login: ${{ secrets.STORE_LOGIN }}
+        snap: ${{ steps.snapcraft.outputs.snap }}
+        release: ${{ github.event.inputs.channel }}

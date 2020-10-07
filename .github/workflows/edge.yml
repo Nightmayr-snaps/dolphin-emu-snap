@@ -23,8 +23,8 @@ jobs:
         sudo pip3 install ./.github/scripts/requirements.txt
     - name: Check latest version
       run: |
-        ./.github/scripts/version.py
-        echo ::set-env name=BUILD::$(cat build)
+        python3 ./.github/scripts/version.py development
+        echo "BUILD=$(cat build)" >> $GITHUB_ENV
       id: version-check
     - name: Already latest versions - cancelling
       if: env.BUILD == 'false'
