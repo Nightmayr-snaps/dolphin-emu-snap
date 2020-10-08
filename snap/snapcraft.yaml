@@ -64,7 +64,6 @@ parts:
     - libudev1
     - libvulkan1
     - mesa-vulkan-drivers
-    - nvidia-driver-440
     - vulkan-utils
     - libbluray2
     - xdg-utils
@@ -129,6 +128,12 @@ parts:
     source-type: local
     prime:
     - -*
+  launchers:
+    plugin: dump
+    source: snap/local/launchers
+    source-type: local
+    organize:
+      '*': bin/
 plugs:
   gtk-3-themes:
     interface: content
@@ -149,11 +154,12 @@ layout:
     symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_intel.so
   /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so:
     symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so
-  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libGLX_nvidia.so.0:
-    symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libGLX_nvidia.so.0
 apps:
   dolphin-emu:
-    command: bin/desktop-launch $SNAP/usr/local/bin/dolphin-emu
+    command: usr/local/bin/dolphin-emu
+    command-chain:
+    - bin/desktop-launch
+    - bin/vulkan-icd-files
     desktop: usr/local/share/applications/dolphin-emu.desktop
     environment:
       HOME: $SNAP_USER_COMMON
@@ -181,6 +187,8 @@ apps:
     - optical-drive
   dolphin-emu-nogui:
     command: usr/local/bin/dolphin-emu-nogui
+    command-chain:
+    - bin/vulkan-icd-files
     environment:
       HOME: $SNAP_USER_COMMON
       LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
