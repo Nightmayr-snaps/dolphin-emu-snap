@@ -1,0 +1,59 @@
+Description: Use GTK+3 wxWidgets backend
+ Change the build system to use the GTK+3 wxWidgets backend because
+ GTK+2 is going away.
+ .
+ Additionally, we add a call at program startup to force the X11
+ backend because various parts of Dolphin (and currently wxWidgets)
+ assume we're running on X11 like we were with GTK+2. This prevents
+ Dolphin from crashing when run inside a Wayland session.
+Author: James Cowgill <jcowgill@debian.org>
+Bug-Debian: https://bugs.debian.org/933428
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -855,27 +855,10 @@ if(NOT DISABLE_WX)
+ 	endif(wxWidgets_FOUND)
+ 
+ 	if(UNIX AND NOT APPLE)
+-		# There is a bug in the FindGTK module in cmake version 2.8.2 that
+-		# does not find gdk-pixbuf-2.0.  On the other hand some 2.8.3
+-		# users have complained that pkg-config does not find
+-		# gdk-pixbuf-2.0.  On yet another hand, cmake version 2.8.3 in
+-		# Ubuntu Natty does not find the glib libraries correctly.
+-		# Ugly!!!
+-		execute_process(COMMAND lsb_release -c -s
+-			OUTPUT_VARIABLE DIST_NAME
+-			ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+-		if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}
+-				VERSION_EQUAL 2.8.2 OR "${DIST_NAME}" STREQUAL "natty")
+-			check_lib(GTK2 gtk+-2.0 gtk+-2.0 gtk.h REQUIRED)
+-		else()
+-			include(FindGTK2)
+-			if(GTK2_FOUND)
+-				include_directories(${GTK2_INCLUDE_DIRS})
+-				list(APPEND LIBS ${GTK2_LIBRARIES})
+-			else()
+-				message(FATAL_ERROR "GTK is required to build the WX UI. Please install the GTK development libraries.")
+-			endif()
+-		endif()
++		find_package(PkgConfig REQUIRED)
++		pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
++		include_directories(${GTK3_INCLUDE_DIRS})
++		list(APPEND LIBS ${GTK3_LIBRARIES})
+ 	endif()
+ 
+ 	if(wxWidgets_FOUND)
+--- a/Source/Core/DolphinWX/Main.cpp
++++ b/Source/Core/DolphinWX/Main.cpp
+@@ -90,6 +90,10 @@ bool DolphinApp::Initialize(int& c, wxCh
+ {
+ #if defined HAVE_X11 && HAVE_X11
+ 	XInitThreads();
++#ifdef __WXGTK3__
++	// Force X11 GTK+3 backend
++	gdk_set_allowed_backends("x11");
++#endif
+ #endif
+ 	return wxApp::Initialize(c, v);
+ }
