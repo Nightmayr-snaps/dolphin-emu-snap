@@ -28,61 +28,6 @@ parts:
     - "-DENABLE_SDL=ON"
     source: https://github.com/dolphin-emu/dolphin.git
     source-tag: '5.0'
-    # build-snaps:
-    #   - cmake
-    # # core16
-    # build-packages:
-    #   - build-essential
-    #   - ffmpeg 
-    #   - libavcodec-dev
-    #   - libevdev-dev
-    #   - libusb-1.0-0-dev
-    #   - libavformat-dev
-    #   - libswscale-dev
-    #   # - libwxbase3.0-dev
-    #   # - libwxgtk3.0-dev
-    #   - libsdl2-dev
-    #   - libsfml-dev
-    #   - libminiupnpc-dev
-    #   - libmbedtls-dev
-    #   - libhidapi-dev
-    #   - libpulse-dev
-    #   - libpangocairo-1.0-0
-    #   # - libgtk2.0-dev
-    #   - libgtk-3-dev
-    #   - libgdk-pixbuf2.0-dev
-    #   - libbluetooth-dev
-    #   - libudev-dev
-    # stage-packages:
-    #   - libusb-1.0-0
-    #   - ffmpeg
-    #   - libavcodec-ffmpeg56
-    #   - libhidapi-hidraw0
-    #   - libhidapi-libusb0
-    #   - libsfml-audio2.3v5
-    #   - libsfml-graphics2.3v5
-    #   - libsfml-network2.3v5
-    #   - libsfml-system2.3v5
-    #   - libsfml-window2.3v5
-    #   - libmbedtls10
-    #   - libminiupnpc10
-    #   - libavformat-ffmpeg56
-    #   - libbluetooth3
-    #   - libpulse0
-    #   - libgtk-3-0
-    #   # - libwxgtk3.0-0v5
-    #   # - libwxbase3.0-0v5
-    #   - libswscale-ffmpeg3
-    #   - libslang2
-    #   - libevdev2
-    #   - libglu1-mesa
-    #   - libsdl2-2.0-0
-    #   - libgl1-mesa-dri
-    #   - libudev1
-    #   - libbluray1
-    #   - xdg-utils
-    #   - freeglut3
-    # Build/Stage packages for core18
     build-packages:
       - build-essential
       - ffmpeg 
@@ -141,7 +86,6 @@ parts:
       git apply $SNAPCRAFT_STAGE/5.0/gtk3.patch
       git apply $SNAPCRAFT_STAGE/5.0/nopie.patch
     override-build: |
-      # apt remove cmake -y
       snapcraftctl build
       sed -i 's|Icon=dolphin-emu|Icon=/usr/local/share/icons/hicolor/scalable/apps/dolphin-emu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
       sed -i 's|Exec=env QT_QPA_PLATFORM=xcb dolphin-emu|Exec=dolphin-emu|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
@@ -150,22 +94,6 @@ parts:
         usr/local/share/dolphin-emu/sys: usr/local/bin/Sys
     after:
       - patches
-      # - wxwidgets
-  # wxwidgets:
-  #   plugin: autotools
-  #   configflags:
-  #   - --prefix=/usr
-  #   - --with-gtk=3
-  #   - --with-opengl
-  #   build-packages:
-  #     - build-essential
-  #     - libgtk-3-dev
-  #   source: https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.4/wxWidgets-3.1.4.tar.bz2
-  #   override-build: |
-  #     snapcraftctl build
-  #     rm $SNAPCRAFT_PART_INSTALL/usr/bin/wx-config
-  #     ln -s ../lib/wx/config/gtk2-unicode-3.1 $SNAPCRAFT_PART_INSTALL/usr/bin/wx-config
-  #     sed -E -i 's|^prefix=(.*)-/usr|prefix=\1-'"$SNAPCRAFT_STAGE"'/usr|' $SNAPCRAFT_PART_INSTALL/usr/bin/wx-config
   desktop-qt5:
     build-packages:
       - build-essential
@@ -223,16 +151,6 @@ plugs:
     interface: content
     target: $SNAP/data-dir/sounds
     default-provider: gtk-common-themes
-
-layout:
-  /usr/share/vulkan:
-    symlink: $SNAP/usr/share/vulkan
-  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_intel.so:
-    symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_intel.so
-  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so:
-    symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so
-  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libGLX_nvidia.so.0:
-    symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libGLX_nvidia.so.0
 
 apps:
   dolphin-emu:
