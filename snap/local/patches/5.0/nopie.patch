@@ -1,0 +1,13 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5df4b2eb1f..6a0992f3a8 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -188,7 +188,7 @@ if(NOT ENABLE_GENERIC)
+ 			set(_M_X86 1)
+ 			set(_M_X86_64 1)
+ 			add_definitions(-D_M_X86=1 -D_M_X86_64=1 -msse2)
+-			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fno-pie")
++			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fno-pie -no-pie")
+ 		else()
+ 			message(FATAL_ERROR "x86_32 is an unsupported platform. Enable generic build if you really want a JIT-less binary.")
+ 		endif()
