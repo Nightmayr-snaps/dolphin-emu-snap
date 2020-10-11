@@ -18,6 +18,7 @@ grade: stable
 confinement: strict
 architectures:
   - build-on: amd64
+  - build-on: arm64
 parts:
   dolphin-emu:
     plugin: cmake
@@ -77,6 +78,13 @@ parts:
       - libbluray2
       - xdg-utils
       - freeglut3
+      - libnet-dbus-perl
+      - libx11-protocol-perl
+      # - x11-xserver-utils
+      - libglib2.0-bin
+      - locales-all
+      - xdg-user-dirs
+      - gettext
     override-pull: |
       snapcraftctl pull
       git apply $SNAPCRAFT_STAGE/5.0/reformatxgetbv.patch
@@ -86,6 +94,7 @@ parts:
       git apply $SNAPCRAFT_STAGE/5.0/gtk3.patch
       git apply $SNAPCRAFT_STAGE/5.0/nopie.patch
     override-build: |
+      apt remove libasound2 -y
       snapcraftctl build
       sed -i 's|Icon=dolphin-emu|Icon=/usr/local/share/icons/hicolor/scalable/apps/dolphin-emu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
       sed -i 's|Exec=env QT_QPA_PLATFORM=xcb dolphin-emu|Exec=dolphin-emu|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
@@ -94,29 +103,18 @@ parts:
         usr/local/share/dolphin-emu/sys: usr/local/bin/Sys
     after:
       - patches
-  desktop-qt5:
-    build-packages:
-      - build-essential
-      - qtbase5-dev
-      - dpkg-dev
-    make-parameters:
-      - FLAVOR=qt5
-    plugin: make
-    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-    source-subdir: qt
-    stage-packages:
-      - locales-all
-      - xdg-user-dirs
-    override-prime: |
-      snapcraftctl prime
-      sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
-      sed -i 's|XDG_CONFIG_HOME=$SNAP_USER_DATA|XDG_CONFIG_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
   patches:
     plugin: dump
     source: snap/local/patches
     source-type: local
     prime:
       - -*
+  launchers:
+    plugin: dump
+    source: snap/local/launchers
+    source-type: local
+    organize:
+      '*': bin/
   # This part removes all the files in this snap which already exist in
   # connected content and base snaps. Since these files will be available
   # at runtime from the content and base snaps, they do not need to be
@@ -128,15 +126,26 @@ parts:
     after:  # Make this part run last; list all your other parts here
       - dolphin-emu
       - patches
-      - desktop-qt5
     plugin: nil
     build-snaps:  # List all content-snaps and base snaps you're using here
-      - core
+      - core18
     override-prime: |
       set -eux
-      for snap in "core"; do  # List all content-snaps and base snaps you're using here
+      for snap in "core18"; do  # List all content-snaps and base snaps you're using here
         cd "/snap/$snap/current" && find . -type f -exec rm -f "$SNAPCRAFT_PRIME/{}" \;
       done
+
+layout:
+    /usr/local/lib/$SNAPCRAFT_ARCH_TRIPLET/perl/5.26.1:
+      symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/perl/5.26.1
+    /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/perl5/5.26:
+      symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/perl5/5.26
+    /usr/share/perl5/XML:
+      symlink: $SNAP/usr/share/perl5/XML
+    /usr/share/perl/5.26:
+      symlink: $SNAP/usr/share/perl/5.26.1
+    /usr/share/perl5/X11:
+      symlink: $SNAP/usr/share/perl5/X11
 
 plugs:
   gtk-3-themes:
@@ -154,7 +163,9 @@ plugs:
 
 apps:
   dolphin-emu:
-    command: bin/desktop-launch $SNAP/usr/local/bin/dolphin-emu
+    command: usr/local/bin/dolphin-emu
+    command-chain:
+      - bin/dolphin-launch
     desktop: usr/local/share/applications/dolphin-emu.desktop
     environment:
       HOME: "$SNAP_USER_COMMON"
