@@ -82,8 +82,6 @@ parts:
       - libx11-protocol-perl
       # - x11-xserver-utils
       - libglib2.0-bin
-      - locales-all
-      - xdg-user-dirs
       - gettext
     override-pull: |
       snapcraftctl pull
@@ -103,6 +101,49 @@ parts:
         usr/local/share/dolphin-emu/sys: usr/local/bin/Sys
     after:
       - patches
+      # - desktop-packages
+      - desktop-qt5
+  desktop-qt5:
+    build-packages:
+    - build-essential
+    - qtbase5-dev
+    - dpkg-dev
+    make-parameters:
+    - FLAVOR=qt5
+    plugin: make
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: qt
+    stage-packages:
+    - libxkbcommon0
+    - ttf-ubuntu-font-family
+    - dmz-cursor-theme
+    - light-themes
+    - adwaita-icon-theme
+    - gnome-themes-standard
+    - shared-mime-info
+    - libgdk-pixbuf2.0-0
+    - locales-all
+    - xdg-user-dirs
+    - libgtk2.0-0
+    - xdg-utils
+    override-prime: |
+      snapcraftctl prime
+      sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
+      sed -i 's|XDG_CONFIG_HOME=$SNAP_USER_DATA|XDG_CONFIG_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
+  # desktop-packages:
+  #   plugin: nil
+  #   stage-packages:
+  #     - libgdk-pixbuf2.0-0
+  #     - adwaita-icon-theme
+  #     - gnome-themes-standard
+  #     - shared-mime-info
+  #     - libxkbcommon0
+  #     - ttf-ubuntu-font-family
+  #     - dmz-cursor-theme
+  #     - light-themes
+  #     - locales-all
+  #     - xdg-user-dirs
+  #     - libgtk2.0-0
   patches:
     plugin: dump
     source: snap/local/patches
@@ -121,19 +162,20 @@ parts:
   # included in this snap itself.
   #
   # More info: https://snapcraft-utils-library.readthedocs.io/en/latest/lib/cleanup.html 
-  #
-  cleanup:
-    after:  # Make this part run last; list all your other parts here
-      - dolphin-emu
-      - patches
-    plugin: nil
-    build-snaps:  # List all content-snaps and base snaps you're using here
-      - core18
-    override-prime: |
-      set -eux
-      for snap in "core18"; do  # List all content-snaps and base snaps you're using here
-        cd "/snap/$snap/current" && find . -type f -exec rm -f "$SNAPCRAFT_PRIME/{}" \;
-      done
+  # #
+  # cleanup:
+  #   after:  # Make this part run last; list all your other parts here
+  #     - dolphin-emu
+  #     - patches
+  #     - desktop-packages
+  #   plugin: nil
+  #   build-snaps:  # List all content-snaps and base snaps you're using here
+  #     - core18
+  #   override-prime: |
+  #     set -eux
+  #     for snap in "core18"; do  # List all content-snaps and base snaps you're using here
+  #       cd "/snap/$snap/current" && find . -type f -exec rm -f "$SNAPCRAFT_PRIME/{}" \;
+  #     done
 
 layout:
     /usr/local/lib/$SNAPCRAFT_ARCH_TRIPLET/perl/5.26.1:
@@ -165,7 +207,8 @@ apps:
   dolphin-emu:
     command: usr/local/bin/dolphin-emu
     command-chain:
-      - bin/dolphin-launch
+      # - bin/dolphin-launch
+      - bin/desktop-launch
     desktop: usr/local/share/applications/dolphin-emu.desktop
     environment:
       HOME: "$SNAP_USER_COMMON"

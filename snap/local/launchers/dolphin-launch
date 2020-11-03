@@ -41,7 +41,7 @@ fi
 REALHOME=`getent passwd $UID | cut -d ':' -f 6`
 
 # Set config folder to local path
-export XDG_CONFIG_HOME=$SNAP_USER_DATA/.config
+export XDG_CONFIG_HOME=$SNAP_USER_COMMON/.config
 ensure_dir_exists $XDG_CONFIG_HOME -m 700
 
 # If the user has modified their user-dirs settings, force an update
@@ -193,9 +193,10 @@ prepend_dir XDG_DATA_DIRS $SNAP/usr/share
 prepend_dir XDG_DATA_DIRS $SNAP/share
 prepend_dir XDG_DATA_DIRS $SNAP/data-dir
 prepend_dir XDG_DATA_DIRS $SNAP_USER_DATA
+prepend_dir XDG_DATA_DIRS $SNAP_USER_COMMON
 
 # Set XDG_DATA_HOME to local path
-export XDG_DATA_HOME=$SNAP_USER_DATA/.local/share
+export XDG_DATA_HOME=$SNAP_USER_COMMON/.local/share
 ensure_dir_exists $XDG_DATA_HOME
 
 # Workaround for GLib < 2.53.2 not searching for schemas in $XDG_DATA_HOME:
