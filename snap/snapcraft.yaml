@@ -66,6 +66,7 @@ parts:
     - vulkan-utils
     - libbluray2
     - xdg-utils
+    - libdrm-common
     override-pull: |
       snapcraftctl pull
       git apply $SNAPCRAFT_STAGE/sharedmemory.patch
