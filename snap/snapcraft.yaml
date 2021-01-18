@@ -232,6 +232,7 @@ apps:
       - mount-observe
       - bluez
       - optical-drive
+      - raw-usb
   dolphin-emu-nogui:
     command: usr/local/bin/dolphin-emu-nogui
     environment:
@@ -253,5 +254,5 @@ apps:
       - mount-observe
       - bluez
       - optical-drive
-
+      - raw-usb
 
