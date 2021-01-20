@@ -1,6 +1,6 @@
 name: dolphin-emulator
 base: core18
-version: 5.0-13493
+version: 5.0-13492
 summary: A Wii/GameCube Emulator
 description: "Dolphin is an emulator for two recent Nintendo video game consoles:\
   \ the GameCube and the Wii. \nIt allows PC gamers to enjoy games for these two consoles\
@@ -276,6 +276,7 @@ apps:
     - bluez
     - optical-drive
     - raw-usb
+    - hidraw
   dolphin-emu-nogui:
     command: usr/local/bin/dolphin-emu-nogui
     environment:
@@ -298,3 +299,4 @@ apps:
     - bluez
     - optical-drive
     - raw-usb
+    - hidraw
