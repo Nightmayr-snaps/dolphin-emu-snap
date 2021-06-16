@@ -2,7 +2,10 @@ name: Build-Snap-PR
 
 on:
   pull_request:
-    branches: [ master, beta, edge ]
+    branches:
+      - master
+      - beta
+      - edge
 
 jobs:
   build:
