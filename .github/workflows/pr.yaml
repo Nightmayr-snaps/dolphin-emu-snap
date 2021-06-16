@@ -1,0 +1,21 @@
+name: Build-Snap-PR
+
+on:
+  pull_request:
+    branches: [ master, beta, edge ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: snapcore/action-build@v1
+      id: snapcraft
+    - uses: actions/upload-artifact@v2
+      with:
+        name: snap
+        path: ${{ steps.snapcraft.outputs.snap }}
+    - name: Testing snap
+      run: |
+        sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
+        snap run dolphin-emulator.dolphin-emu --version
