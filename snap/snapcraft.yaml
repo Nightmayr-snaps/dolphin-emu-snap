@@ -111,6 +111,7 @@ parts:
     - xdg-utils
     - qt5-gtk-platformtheme
     - qtwayland5
+    - libglib2.0-0
     override-prime: |
       snapcraftctl prime
       sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
