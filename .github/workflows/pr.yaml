@@ -6,6 +6,7 @@ on:
       - master
       - beta
       - edge
+    types: [ opened, reopened ]
 
 jobs:
   build:
