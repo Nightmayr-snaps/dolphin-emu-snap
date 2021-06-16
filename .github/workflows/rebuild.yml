@@ -12,6 +12,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - name: print channel
+      run: |
+        echo "channel: ${{ github.event.inputs.channel }}"
     - uses: actions/checkout@v2
       if: ${{ github.event.inputs.channel }} == 'stable'
       with:
