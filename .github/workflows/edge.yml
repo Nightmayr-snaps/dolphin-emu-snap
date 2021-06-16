@@ -6,6 +6,7 @@ on:
     - cron: '15 13 * * *'
   push:
     branches: [ edge ]
+  workflow_dispatch:
 
 jobs:
   build:
