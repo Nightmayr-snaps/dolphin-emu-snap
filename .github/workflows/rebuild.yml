@@ -29,7 +29,7 @@ jobs:
     - name: Testing snap
       run: |
         sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
-        snap run yuzu.yuzu-cmd --version
+        snap run dolphin-emulator.dolphin-emu --version
     - uses: snapcore/action-publish@v1
       with:
         store_login: ${{ secrets.STORE_LOGIN }}
