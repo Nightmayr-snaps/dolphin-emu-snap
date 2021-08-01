@@ -1,6 +1,6 @@
 name: dolphin-emulator
 base: core20
-version: 5.0-14344
+version: 5.0-14790
 summary: A Wii/GameCube Emulator
 description: "Dolphin is an emulator for two recent Nintendo video game consoles:\
   \ the GameCube and the Wii. \nIt allows PC gamers to enjoy games for these two consoles\
@@ -21,7 +21,7 @@ parts:
     - -DLINUX_LOCAL_DEV=TRUE
     - -DENABLE_SDL=ON
     source: https://github.com/dolphin-emu/dolphin.git
-    source-commit: acc7d3710d60552769f61f4b44bc8533a940df36
+    source-commit: 3cc274880f47d340bd508dba91aaf37c48acd367
     build-packages:
     - ffmpeg
     - libsdl2-dev
