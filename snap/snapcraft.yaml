@@ -1,6 +1,6 @@
 name: dolphin-emulator
 base: core18
-version: 5.0-15269
+version: 5.0-15271
 summary: A Wii/GameCube Emulator
 description: "Dolphin is an emulator for two recent Nintendo video game consoles:\
   \ the GameCube and the Wii. \nIt allows PC gamers to enjoy games for these two consoles\
@@ -21,7 +21,7 @@ parts:
     - -DLINUX_LOCAL_DEV=TRUE
     - -DENABLE_SDL=ON
     source: https://github.com/dolphin-emu/dolphin.git
-    source-commit: d90b30ca251146c478759190d9b206f38c3b70d3
+    source-commit: ff1cb5a1c08d5a4a2a0449b8b23a4977ccc20f8a
     build-snaps:
     - kde-frameworks-5-core18
     - kde-frameworks-5-core18-sdk
