@@ -1,26 +1,28 @@
 #!/bin/bash
 
-set -x
+#Path to Vulkan ICD files depending on CPU architecture
+case $SNAP_ARCH in
+  amd64)
+    ARCH="x86_64"
+    export VK_ICD_FILENAMES=/var/lib/snapd/lib/vulkan/icd.d/nvidia_icd.json:$SNAP/usr/share/vulkan/icd.d/radeon_icd.$ARCH.json:$SNAP/usr/share/vulkan/icd.d/intel_icd.$ARCH.json
+    ;;
+  arm64)
+    ARCH="aarch64"
+    export VK_ICD_FILENAMES=/var/lib/snapd/lib/vulkan/icd.d/nvidia_icd.json:$SNAP/usr/share/vulkan/icd.d/radeon_icd.$ARCH.json
+    ;;
+  i386)
+    ARCH="i686"
+    export VK_ICD_FILENAMES=/var/lib/snapd/lib/vulkan/icd.d/nvidia_icd.json:$SNAP/usr/share/vulkan/icd.d/radeon_icd.$ARCH.json:$SNAP/usr/share/vulkan/icd.d/intel_icd.$ARCH.json
+    ;;
+  armhf)
+    ARCH="arm"
+    export VK_ICD_FILENAMES=/var/lib/snapd/lib/vulkan/icd.d/nvidia_icd.json:$SNAP/usr/share/vulkan/icd.d/radeon_icd.$ARCH.json
+    ;;
+esac
 
-if [ ! -z "$KDE_FULL_SESSION" ]; then
-  unset KDE_FULL_SESSION
-fi
-
-if echo "$XDG_CURRENT_DESKTOP" | grep -q KDE; then
-  unset XDG_CURRENT_DESKTOP
-else
-  export QT_QPA_PLATFORMTHEME=gtk3
-fi
-
-echo "LD_LIBRARY_PATH before substring removal: $LD_LIBRARY_PATH"
 # Workaround for impish Nvidia discussed here:
 #  - https://forum.snapcraft.io/t/egl-using-snaps-on-impish-seem-to-be-broken-when-using-the-nvidia-proprietary-driver/25715
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH#$SNAP_LIBRARY_PATH:}"
-echo "LD_LIBRARY_PATH after substring removal: $LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${SNAP_LIBRARY_PATH}"
-echo "LD_LIBRARY_PATH after appending SNAP_LIBRARY_PATH: $LD_LIBRARY_PATH"
-
-
-set +x
 
 exec "${@}"

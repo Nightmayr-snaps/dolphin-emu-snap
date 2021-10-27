@@ -160,7 +160,7 @@ apps:
     command: usr/local/bin/dolphin-emu
     command-chain:
     - bin/desktop-launch
-    - bin/vulkan-icd-files
+    - bin/dolphin-launch
     desktop: usr/local/share/applications/dolphin-emu.desktop
     environment:
       HOME: $SNAP_USER_COMMON
@@ -190,7 +190,7 @@ apps:
   dolphin-emu-nogui:
     command: usr/local/bin/dolphin-emu-nogui
     command-chain:
-    - bin/vulkan-icd-files
+    - bin/dolphin-launch
     environment:
       HOME: $SNAP_USER_COMMON
       LD_LIBRARY_PATH: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
