@@ -1,4 +1,4 @@
-PyYAML==5.3.1
+PyYAML==5.4
 requests==2.22.0
 requests-html==0.10.0
 ruamel.yaml==0.16.10
