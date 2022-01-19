@@ -1,5 +1,5 @@
 name: dolphin-emulator
-base: core18
+base: core20
 version: 5.0-15686
 summary: A Wii/GameCube Emulator
 description: "Dolphin is an emulator for two recent Nintendo video game consoles:\
@@ -15,23 +15,26 @@ architectures:
 parts:
   dolphin-emu:
     plugin: cmake
-    configflags:
+    cmake-parameters:
     - -DCMAKE_BUILD_TYPE=Release
     - -DCMAKE_INSTALL_PREFIX=/usr/local
     - -DLINUX_LOCAL_DEV=TRUE
     - -DENABLE_SDL=ON
+    - -DUSE_SHARED_ENET=ON
+    - -DCMAKE_FIND_ROOT_PATH=/usr\;/root/stage\;/snap/nightmayr-kf5-qt-5-15-2-core20-sdk/current
     source: https://github.com/dolphin-emu/dolphin.git
     source-commit: a29d7625ddb67f29f6dc46858b2b1488b72fd42b
+    build-environment:
+    - CC: "gcc-10"
+    - CXX: "g++-10"
     build-snaps:
-    - kde-frameworks-5-core18
-    - kde-frameworks-5-core18-sdk
+    - nightmayr-kf5-qt-5-15-2-core20-sdk/latest/stable
+    - cmake
     build-packages:
-    - ffmpeg
-    - libavcodec-dev
+    - gcc-10
+    - g++-10
     - libevdev-dev
     - libusb-1.0-0-dev
-    - libavformat-dev
-    - libswscale-dev
     - libsfml-dev
     - libminiupnpc-dev
     - libmbedtls-dev
@@ -41,24 +44,20 @@ parts:
     - libbluetooth-dev
     - libudev-dev
     - libpulse-dev
-    - libsdl2-dev
+    - libenet-dev
     stage-packages:
     - libusb-1.0-0
-    - ffmpeg
-    - libavcodec57
     - libhidapi-hidraw0
     - libhidapi-libusb0
-    - libsfml-audio2.4
-    - libsfml-graphics2.4
-    - libsfml-network2.4
-    - libsfml-system2.4
-    - libsfml-window2.4
-    - libmbedtls10
-    - libminiupnpc10
-    - libavformat57
+    - libsfml-audio2.5
+    - libsfml-graphics2.5
+    - libsfml-network2.5
+    - libsfml-system2.5
+    - libsfml-window2.5
+    - libmbedtls12
+    - libminiupnpc17
     - libbluetooth3
     - libgl1-mesa-dri
-    - libswscale4
     - libudev1
     - libvulkan1
     - libasound2
@@ -67,6 +66,8 @@ parts:
     - libbluray2
     - xdg-utils
     - libdrm-common
+    - libevdev2
+    - libenet7
     override-pull: |
       snapcraftctl pull
       git apply $SNAPCRAFT_STAGE/sharedmemory.patch
@@ -94,147 +95,34 @@ parts:
     source-type: local
     prime:
     - -*
-  qgnomeplatform:
-    source: https://github.com/FedoraQt/QGnomePlatform.git
-    source-depth: 1
-    source-tag: 0.6.0
-    plugin: dump
-    build-snaps:
-    - kde-frameworks-5-core18-sdk
-    - kde-frameworks-5-core18
+  kde-neon-extension:
     build-packages:
-    - libglvnd-dev
-    - libgtk-3-dev
-    stage-packages:
-    - libgtk-3-0
-    - cinnamon-desktop-data
-    override-build: |
-      KF5_DIR=/snap/kde-frameworks-5-core18-sdk/current
-      $KF5_DIR/usr/lib/qt5/bin/qmake -qtconf "$SNAPCRAFT_STAGE/qt.conf"
-      make -j$(nproc)
-      make INSTALL_ROOT="$SNAPCRAFT_PART_INSTALL/tmp" install
-      cp -a "$SNAPCRAFT_PART_INSTALL/tmp/$KF5_DIR/." "$SNAPCRAFT_PART_INSTALL"
-      rm -r "$SNAPCRAFT_PART_INSTALL/tmp"
-    stage:
-    - -usr/share/doc
-    after:
-    - qtconf
-    - qtwayland
-  qtconf:
-    plugin: nil
-    override-build: |
-      KF5_DIR=/snap/kde-frameworks-5-core18-sdk/current
-
-      install -d "$SNAPCRAFT_PART_INSTALL/usr/include/$SNAPCRAFT_ARCH_TRIPLET"
-      cp -a $KF5_DIR/usr/include/$SNAPCRAFT_ARCH_TRIPLET/qt5 "$SNAPCRAFT_PART_INSTALL/usr/include/$SNAPCRAFT_ARCH_TRIPLET"
-
-      install -d "$SNAPCRAFT_PART_INSTALL/usr/lib/$SNAPCRAFT_ARCH_TRIPLET"
-      cp -a $KF5_DIR/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5 "$SNAPCRAFT_PART_INSTALL/usr/lib/$SNAPCRAFT_ARCH_TRIPLET"
-
-      cat << EOF > "$SNAPCRAFT_PART_INSTALL/qt.conf"
-      [Paths]
-      Prefix=$KF5_DIR/usr
-      ArchData=lib/$SNAPCRAFT_ARCH_TRIPLET/qt5
-      Binaries=lib/qt5/bin
-      Data=share/qt5
-      Documentation=share/qt5/doc
-      Examples=lib/$SNAPCRAFT_ARCH_TRIPLET/qt5/examples
-      Headers=$SNAPCRAFT_STAGE/usr/include/$SNAPCRAFT_ARCH_TRIPLET/qt5
-      HostBinaries=lib/qt5/bin
-      HostData=$SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5
-      HostLibraries=lib/$SNAPCRAFT_ARCH_TRIPLET
-      Imports=lib/$SNAPCRAFT_ARCH_TRIPLET/qt5/imports
-      Libraries=lib/$SNAPCRAFT_ARCH_TRIPLET
-      LibraryExecutables=lib/$SNAPCRAFT_ARCH_TRIPLET/qt5/libexec
-      Plugins=lib/$SNAPCRAFT_ARCH_TRIPLET/qt5/plugins
-      Qml2Imports=lib/$SNAPCRAFT_ARCH_TRIPLET/qt5/qml
-      Settings=/etc/xdg
-      Translations=share/qt5/translations
-      EOF
-    stage:
-    - -usr/lib/x86_64-linux-gnu/qt5/plugins/platforms/libqwayland*
-    - -usr/lib/x86_64-linux-gnu/qt5/plugins/wayland*
-    - -usr/lib/x86_64-linux-gnu/qt5/qml/QtWayland
-    - -usr/share/doc
-    prime:
-    - -./*
-  qtimageformats:
-    source: https://github.com/qt/qtimageformats.git
-    source-depth: 1
-    source-tag: v5.12.3
-    plugin: dump
+    - g++
     build-snaps:
-    - kde-frameworks-5-core18-sdk
-    - kde-frameworks-5-core18
-    build-packages:
-    - libglvnd-dev
-    override-build: |
-      KF5_DIR=/snap/kde-frameworks-5-core18-sdk/current
-      $KF5_DIR/usr/lib/qt5/bin/qmake -qtconf "$SNAPCRAFT_STAGE/qt.conf"
-      make -j$(nproc)
-      make INSTALL_ROOT="$SNAPCRAFT_PART_INSTALL/tmp" install
-      cp -a "$SNAPCRAFT_PART_INSTALL/tmp/$KF5_DIR/." "$SNAPCRAFT_PART_INSTALL"
-      rm -r "$SNAPCRAFT_PART_INSTALL/tmp"
-    stage:
-    - -usr/share/doc
-    after:
-    - qtconf
-  qtwayland:
-    source: https://github.com/qt/qtwayland.git
-    source-depth: 1
-    source-tag: v5.12.3
-    plugin: dump
-    build-snaps:
-    - kde-frameworks-5-core18-sdk
-    - kde-frameworks-5-core18
-    build-packages:
-    - libglvnd-dev
-    override-build: |
-      KF5_DIR=/snap/kde-frameworks-5-core18-sdk/current
-      $KF5_DIR/usr/lib/qt5/bin/qmake -qtconf "$SNAPCRAFT_STAGE/qt.conf"
-      make -j$(nproc)
-      make INSTALL_ROOT="$SNAPCRAFT_PART_INSTALL/tmp" install
-      cp -a "$SNAPCRAFT_PART_INSTALL/tmp/$KF5_DIR/." "$SNAPCRAFT_PART_INSTALL"
-      cp -a "$SNAPCRAFT_PART_INSTALL/tmp/$SNAPCRAFT_STAGE/." "$SNAPCRAFT_PART_INSTALL"
-      rm -r "$SNAPCRAFT_PART_INSTALL/tmp"
-    stage:
-    - -usr/share/doc
-    after:
-    - qtconf
-    prime:
-    - -./*
+    - kde-frameworks-5-qt-5-15-3-core20-sdk/latest/candidate
+    make-parameters:
+    - PLATFORM_PLUG=nightmayr-kf5-qt-5-15-2-core20
+    plugin: make
+    source: $SNAPCRAFT_EXTENSIONS_DIR/desktop
+    source-subdir: kde-neon
+    override-prime: |
+      snapcraftctl prime
+      sed -i 's|XDG_DATA_HOME="$SNAP_USER_DATA|XDG_DATA_HOME="$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/snap/command-chain/desktop-launch
   cleanup:
     after:
     - dolphin-emu
     - patches
     - launchers
-    - qtwayland
-    - qtimageformats
-    - qgnomeplatform
-    - qtconf
+    - kde-neon-extension
     plugin: nil
     build-snaps:
-    - core18
-    - kde-frameworks-5-core18
-    - kde-frameworks-5-core18-sdk
+    - core20
+    - nightmayr-kf5-qt-5-15-2-core20
     override-prime: |
       set -eux
-      for snap in "core18" "kde-frameworks-5-core18" "kde-frameworks-5-core18-sdk"; do  # List all content-snaps and base snaps you're using here
+      for snap in "core20" "nightmayr-kf5-qt-5-15-2-core20"; do
         cd "/snap/$snap/current" && find . -type f,l -exec rm -f "$SNAPCRAFT_PRIME/{}" \;
       done
-plugs:
-  gtk-3-themes:
-    interface: content
-    target: $SNAP/data-dir/themes
-    default-provider: gtk-common-themes
-  icon-themes:
-    interface: content
-    target: $SNAP/data-dir/icons
-    default-provider: gtk-common-themes
-  sound-themes:
-    interface: content
-    target: $SNAP/data-dir/sounds
-    default-provider: gtk-common-themes
 layout:
   /usr/share/vulkan:
     symlink: $SNAP/usr/share/vulkan
@@ -242,20 +130,21 @@ layout:
     symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_intel.so
   /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so:
     symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so
+  /usr/share/qt5:
+    symlink: $SNAP/kf5/usr/share/qt5
   /usr/share/libdrm:
-    symlink: $SNAP/usr/share/libdrm
+    symlink: $SNAP/kf5/usr/share/libdrm
 apps:
   dolphin-emu:
-    extensions:
-    - kde-neon
     command: usr/local/bin/dolphin-emu
     command-chain:
+    - snap/command-chain/desktop-launch
     - bin/dolphin-launch
     - bin/vulkan-icd-files
     desktop: usr/local/share/applications/dolphin-emu.desktop
     environment:
       HOME: $SNAP_USER_COMMON
-      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
+      LD_LIBRARY_PATH: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
       DISABLE_WAYLAND: 1
     plugs:
     - desktop
@@ -279,9 +168,12 @@ apps:
     - hidraw
   dolphin-emu-nogui:
     command: usr/local/bin/dolphin-emu-nogui
+    command-chain:
+    - snap/command-chain/desktop-launch
+    - bin/vulkan-icd-files
     environment:
       HOME: $SNAP_USER_COMMON
-      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
+      LD_LIBRARY_PATH: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
       DISABLE_WAYLAND: 1
     plugs:
     - x11
@@ -300,3 +192,28 @@ apps:
     - optical-drive
     - raw-usb
     - hidraw
+assumes:
+- snapd2.43
+plugs:
+  desktop:
+    mount-host-font-cache: false
+  icon-themes:
+    default-provider: gtk-common-themes
+    interface: content
+    target: $SNAP/data-dir/icons
+  nightmayr-kf5-qt-5-15-2-core20:
+    default-provider: nightmayr-kf5-qt-5-15-2-core20
+    interface: content
+    target: $SNAP/kf5
+  sound-themes:
+    default-provider: gtk-common-themes
+    interface: content
+    target: $SNAP/data-dir/sounds
+environment:
+  SNAP_DESKTOP_RUNTIME: $SNAP/kf5
+hooks:
+  configure:
+    command-chain:
+    - snap/command-chain/hooks-configure-desktop
+    plugs:
+    - desktop
