@@ -15,20 +15,6 @@ ensure_dir_exists $XDG_DATA_HOME
 export XDG_CACHE_HOME=$SNAP_USER_COMMON/.cache
 ensure_dir_exists $XDG_CACHE_HOME
 
-# Fix gdk-pixbuf-loaders.cache file until kde-frameworks-5 content snap includes gdk-pixbuf SVG module
-# use the svg module present in the snap itself
-# see discussion here: https://forum.snapcraft.io/t/broken-theming-and-missing-icons-on-gtk-file-picker-using-kde-neon-extension/18937
-if ! grep -q "libpixbufloader-svg.so" $XDG_CACHE_HOME/gdk-pixbuf-loaders.cache; then
-cat << EOF >> $XDG_CACHE_HOME/gdk-pixbuf-loaders.cache
-"$SNAP/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-svg.so"
-"svg" 6 "gdk-pixbuf" "Scalable Vector Graphics" "LGPL"
-"image/svg+xml" "image/svg" "image/svg-xml" "image/vnd.adobe.svg+xml" "text/xml-svg" "image/svg+xml-compressed" ""
-"svg" "svgz" "svg.gz" ""
-" <svg" "*    " 100
-" <!DOCTYPE svg" "*             " 100
-
-
-EOF
-fi
+export PATH=$PATH:$KF5_LIBEXEC_DIR
 
 exec "${@}"
