@@ -1,5 +1,5 @@
 diff --git a/Source/Core/Common/MemArenaUnix.cpp b/Source/Core/Common/MemArenaUnix.cpp
-index 1743c2ace0..311469f1f0 100644
+index 549ce09cfd..59b1a3183d 100644
 --- a/Source/Core/Common/MemArenaUnix.cpp
 +++ b/Source/Core/Common/MemArenaUnix.cpp
 @@ -27,7 +27,7 @@ MemArena::~MemArena() = default;
@@ -8,6 +8,6 @@ index 1743c2ace0..311469f1f0 100644
  {
 -  const std::string file_name = "/dolphin-emu." + std::to_string(getpid());
 +  const std::string file_name = "/snap.dolphin-emulator.dolphin-emu." + std::to_string(getpid());
-   fd = shm_open(file_name.c_str(), O_RDWR | O_CREAT | O_EXCL, 0600);
-   if (fd == -1)
+   m_shm_fd = shm_open(file_name.c_str(), O_RDWR | O_CREAT | O_EXCL, 0600);
+   if (m_shm_fd == -1)
    {
