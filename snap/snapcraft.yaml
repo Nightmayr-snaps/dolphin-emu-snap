@@ -191,6 +191,7 @@ apps:
     - bluez
     - optical-drive
     - raw-usb
+    - screen-inhibit-control
     - hidraw
 assumes:
 - snapd2.43
