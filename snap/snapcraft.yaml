@@ -20,32 +20,35 @@ parts:
     - -DCMAKE_INSTALL_PREFIX=/usr/local
     - -DLINUX_LOCAL_DEV=TRUE
     - -DENABLE_SDL=ON
+    - -DUSE_SHARED_ENET=ON
+    - -DCMAKE_FIND_ROOT_PATH=/usr\;/root/stage\;/snap/nightmayr-kf5-qt-5-15-2-core20-sdk/current
     source: https://github.com/dolphin-emu/dolphin.git
-    source-commit: db02b50d2ecdfbbc21e19aadc57253c353069f77
+    source-commit: 905e86d7546b30487ad99181380575f3988fc73f
+    build-environment:
+    - CC: gcc-10
+    - CXX: g++-10
+    build-snaps:
+    - nightmayr-kf5-qt-5-15-2-core20-sdk/latest/stable
+    - cmake
     build-packages:
-    - ffmpeg
-    - libsdl2-dev
-    - libavcodec-dev
+    - gcc-10
+    - g++-10
     - libevdev-dev
     - libusb-1.0-0-dev
-    - libavformat-dev
-    - libswscale-dev
     - libsfml-dev
     - libminiupnpc-dev
     - libmbedtls-dev
     - libhidapi-dev
     - libpangocairo-1.0-0
+    - libgtk2.0-dev
     - libbluetooth-dev
     - libudev-dev
     - libpulse-dev
-    - qtbase5-private-dev
+    - libenet-dev
     stage-packages:
     - libusb-1.0-0
     - libhidapi-hidraw0
     - libhidapi-libusb0
-    - ffmpeg
-    - libavcodec58
-    - libavformat58
     - libsfml-audio2.5
     - libsfml-graphics2.5
     - libsfml-network2.5
@@ -53,22 +56,18 @@ parts:
     - libsfml-window2.5
     - libmbedtls12
     - libminiupnpc17
-    - libswscale5
     - libbluetooth3
-    - libpulse0
-    - libslang2
-    - libevdev2
-    - libglu1-mesa
-    - libsdl2-2.0-0
-    - libopengl0
+    - libgl1-mesa-dri
     - libudev1
     - libvulkan1
+    - libasound2
     - mesa-vulkan-drivers
     - vulkan-utils
     - libbluray2
     - xdg-utils
-    - freeglut3
-    - libgl1-mesa-dri
+    - libdrm-common
+    - libevdev2
+    - libenet7
     override-pull: |
       snapcraftctl pull
       git apply $SNAPCRAFT_STAGE/sharedmemory.patch
@@ -77,77 +76,52 @@ parts:
       snapcraftctl build
       sed -i 's|Icon=dolphin-emu|Icon=/usr/local/share/icons/hicolor/scalable/apps/dolphin-emu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
       sed -i 's|Exec=env QT_QPA_PLATFORM=xcb dolphin-emu|Exec=dolphin-emu|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
+    stage:
+    - -usr/share/doc
     organize:
       usr/local/share/dolphin-emu/sys: usr/local/bin/Sys
     after:
     - patches
-    - desktop-qt5
-  desktop-qt5:
-    build-packages:
-    - build-essential
-    - qtbase5-dev
-    - dpkg-dev
-    make-parameters:
-    - FLAVOR=qt5
-    plugin: make
-    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-    source-subdir: qt
-    stage-packages:
-    - libxkbcommon0
-    - ttf-ubuntu-font-family
-    - dmz-cursor-theme
-    - light-themes
-    - adwaita-icon-theme
-    - gnome-themes-standard
-    - shared-mime-info
-    - libqt5gui5
-    - libgdk-pixbuf2.0-0
-    - libqt5svg5
-    - try:
-      - appmenu-qt5
-    - locales-all
-    - xdg-user-dirs
-    - libgtk2.0-0
-    - xdg-utils
-    - qt5-gtk-platformtheme
-    - qtwayland5
-    - libglib2.0-0
-    override-prime: |
-      snapcraftctl prime
-      sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
-      sed -i 's|XDG_CONFIG_HOME=$SNAP_USER_DATA|XDG_CONFIG_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
-  plasma-integration:
-    plugin: nil
-    stage-packages:
-    - breeze-icon-theme
-    - kde-style-breeze
-    - plasma-integration
-    - libgpm2
-  patches:
-    plugin: dump
-    source: snap/local/patches
-    source-type: local
-    prime:
-    - -*
   launchers:
     plugin: dump
     source: snap/local/launchers
     source-type: local
     organize:
       '*': bin/
-plugs:
-  gtk-3-themes:
-    interface: content
-    target: $SNAP/data-dir/themes
-    default-provider: gtk-common-themes
-  icon-themes:
-    interface: content
-    target: $SNAP/data-dir/icons
-    default-provider: gtk-common-themes
-  sound-themes:
-    interface: content
-    target: $SNAP/data-dir/sounds
-    default-provider: gtk-common-themes
+  patches:
+    plugin: dump
+    source: snap/local/patches
+    source-type: local
+    prime:
+    - -*
+  kde-neon-extension:
+    build-packages:
+    - g++
+    build-snaps:
+    - kde-frameworks-5-qt-5-15-3-core20-sdk/latest/candidate
+    make-parameters:
+    - PLATFORM_PLUG=nightmayr-kf5-qt-5-15-2-core20
+    plugin: make
+    source: $SNAPCRAFT_EXTENSIONS_DIR/desktop
+    source-subdir: kde-neon
+    override-prime: |
+      snapcraftctl prime
+      sed -i 's|XDG_DATA_HOME="$SNAP_USER_DATA|XDG_DATA_HOME="$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/snap/command-chain/desktop-launch
+  cleanup:
+    after:
+    - dolphin-emu
+    - patches
+    - launchers
+    - kde-neon-extension
+    plugin: nil
+    build-snaps:
+    - core20
+    - nightmayr-kf5-qt-5-15-2-core20
+    override-prime: |
+      set -eux
+      for snap in "core20" "nightmayr-kf5-qt-5-15-2-core20"; do
+        cd "/snap/$snap/current" && find . -type f,l -exec rm -f "$SNAPCRAFT_PRIME/{}" \;
+      done
 layout:
   /usr/share/vulkan:
     symlink: $SNAP/usr/share/vulkan
@@ -155,19 +129,21 @@ layout:
     symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_intel.so
   /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so:
     symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so
+  /usr/share/qt5:
+    symlink: $SNAP/kf5/usr/share/qt5
+  /usr/share/libdrm:
+    symlink: $SNAP/kf5/usr/share/libdrm
 apps:
   dolphin-emu:
     command: usr/local/bin/dolphin-emu
     command-chain:
-    - bin/desktop-launch
+    - snap/command-chain/desktop-launch
     - bin/dolphin-launch
     desktop: usr/local/share/applications/dolphin-emu.desktop
     environment:
       HOME: $SNAP_USER_COMMON
       LD_LIBRARY_PATH: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
-      KDE_FORK_SLAVES: 1
       DISABLE_WAYLAND: 1
-      PATH: $PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5
     plugs:
     - desktop
     - desktop-legacy
@@ -190,6 +166,7 @@ apps:
   dolphin-emu-nogui:
     command: usr/local/bin/dolphin-emu-nogui
     command-chain:
+    - snap/command-chain/desktop-launch
     - bin/dolphin-launch
     environment:
       HOME: $SNAP_USER_COMMON
@@ -211,3 +188,29 @@ apps:
     - bluez
     - optical-drive
     - raw-usb
+    - screen-inhibit-control
+assumes:
+- snapd2.43
+plugs:
+  desktop:
+    mount-host-font-cache: false
+  icon-themes:
+    default-provider: gtk-common-themes
+    interface: content
+    target: $SNAP/data-dir/icons
+  nightmayr-kf5-qt-5-15-2-core20:
+    default-provider: nightmayr-kf5-qt-5-15-2-core20
+    interface: content
+    target: $SNAP/kf5
+  sound-themes:
+    default-provider: gtk-common-themes
+    interface: content
+    target: $SNAP/data-dir/sounds
+environment:
+  SNAP_DESKTOP_RUNTIME: $SNAP/kf5
+hooks:
+  configure:
+    command-chain:
+    - snap/command-chain/hooks-configure-desktop
+    plugs:
+    - desktop

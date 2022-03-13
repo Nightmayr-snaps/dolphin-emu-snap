@@ -1,13 +1,13 @@
-diff --git a/Source/Core/Common/MemArena.cpp b/Source/Core/Common/MemArena.cpp
-index fcd18892baf..650849f2e63 100644
---- a/Source/Core/Common/MemArena.cpp
-+++ b/Source/Core/Common/MemArena.cpp
-@@ -68,7 +68,7 @@ void MemArena::GrabSHMSegment(size_t size)
-     return;
-   }
- #else
+diff --git a/Source/Core/Common/MemArenaUnix.cpp b/Source/Core/Common/MemArenaUnix.cpp
+index 549ce09cfd..59b1a3183d 100644
+--- a/Source/Core/Common/MemArenaUnix.cpp
++++ b/Source/Core/Common/MemArenaUnix.cpp
+@@ -27,7 +27,7 @@ MemArena::~MemArena() = default;
+ 
+ void MemArena::GrabSHMSegment(size_t size)
+ {
 -  const std::string file_name = "/dolphin-emu." + std::to_string(getpid());
 +  const std::string file_name = "/snap.dolphin-emulator.dolphin-emu." + std::to_string(getpid());
-   fd = shm_open(file_name.c_str(), O_RDWR | O_CREAT | O_EXCL, 0600);
-   if (fd == -1)
+   m_shm_fd = shm_open(file_name.c_str(), O_RDWR | O_CREAT | O_EXCL, 0600);
+   if (m_shm_fd == -1)
    {
