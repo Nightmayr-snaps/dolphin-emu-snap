@@ -1,6 +1,6 @@
 name: dolphin-emulator
 base: core20
-version: 5.0-16292
+version: 5.0-16301
 summary: A Wii/GameCube Emulator
 description: "Dolphin is an emulator for two recent Nintendo video game consoles:\
   \ the GameCube and the Wii. \nIt allows PC gamers to enjoy games for these two consoles\
@@ -23,7 +23,7 @@ parts:
     - -DUSE_SHARED_ENET=ON
     - -DCMAKE_FIND_ROOT_PATH=/usr\;/root/stage\;/snap/nightmayr-kf5-qt-5-15-2-core20-sdk/current
     source: https://github.com/dolphin-emu/dolphin.git
-    source-commit: 2e01dc0c82b5f73215e3425ab45ff6c7ee50b389
+    source-commit: 56bb965ab944bd01bf511df31b7c9d91f8e62bd4
     build-environment:
     - CC: gcc-10
     - CXX: g++-10
