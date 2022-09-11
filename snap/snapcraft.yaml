@@ -71,7 +71,6 @@ parts:
     override-pull: |
       snapcraftctl pull
       git apply $SNAPCRAFT_STAGE/nodirtyversion.patch
-      # git apply $SNAPCRAFT_STAGE/forcexdg.patch
     override-build: |
       snapcraftctl build
       sed -i 's|Icon=dolphin-emu|Icon=/usr/local/share/icons/hicolor/scalable/apps/dolphin-emu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/dolphin-emu.desktop
