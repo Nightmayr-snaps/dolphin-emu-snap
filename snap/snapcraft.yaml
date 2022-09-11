@@ -70,7 +70,6 @@ parts:
     - libenet7
     override-pull: |
       snapcraftctl pull
-      git apply $SNAPCRAFT_STAGE/sharedmemory.patch
       git apply $SNAPCRAFT_STAGE/nodirtyversion.patch
     override-build: |
       snapcraftctl build
@@ -163,6 +162,7 @@ apps:
     - bluez
     - optical-drive
     - raw-usb
+    - shmem
   dolphin-emu-nogui:
     command: usr/local/bin/dolphin-emu-nogui
     command-chain:
@@ -189,6 +189,16 @@ apps:
     - optical-drive
     - raw-usb
     - screen-inhibit-control
+    - hidraw
+    - shmem
+  dolphin-tool:
+    command: usr/local/bin/dolphin-tool
+    environment:
+      LD_LIBRARY_PATH: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/kf5/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/kf5/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio:$SNAP/kf5/lib/$SNAPCRAFT_ARCH_TRIPLET
+      HOME: $SNAP_USER_COMMON
+    plugs:
+    - home
+    - removable-media
 assumes:
 - snapd2.43
 plugs:
@@ -206,6 +216,9 @@ plugs:
     default-provider: gtk-common-themes
     interface: content
     target: $SNAP/data-dir/sounds
+  shmem:
+    interface: shared-memory
+    private: true
 environment:
   SNAP_DESKTOP_RUNTIME: $SNAP/kf5
 hooks:
