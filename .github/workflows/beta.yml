@@ -33,10 +33,10 @@ jobs:
       uses: andymckay/cancel-action@0.2
     - uses: snapcore/action-build@v1.1.0
       id: snapcraft
-    - name: Testing snap
-      run: |
-        sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
-        snap run dolphin-emulator.dolphin-emu-nogui --version
+#     - name: Testing snap
+#       run: |
+#         sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
+#         snap run dolphin-emulator.dolphin-emu-nogui --version
     - uses: snapcore/action-publish@v1.1.1
       env:
         SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
