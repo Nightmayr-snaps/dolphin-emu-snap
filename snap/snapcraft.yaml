@@ -16,6 +16,7 @@ license: GPL-2.0
 icon: snap/gui/dolphin-emu.png
 grade: stable
 confinement: strict
+compression: lzo
 architectures:
   - build-on: amd64
   - build-on: arm64
@@ -80,13 +81,11 @@ parts:
       - freeglut3
       - libnet-dbus-perl
       - libx11-protocol-perl
-      # - x11-xserver-utils
       - libglib2.0-bin
       - gettext
     override-pull: |
       snapcraftctl pull
       git apply $SNAPCRAFT_STAGE/5.0/reformatxgetbv.patch
-      git apply $SNAPCRAFT_STAGE/5.0/sharedmemory.patch
       git apply $SNAPCRAFT_STAGE/5.0/rasterfontconstnames.patch
       git apply $SNAPCRAFT_STAGE/5.0/removedirtyversion.patch
       git apply $SNAPCRAFT_STAGE/5.0/gtk3.patch
@@ -101,7 +100,6 @@ parts:
         usr/local/share/dolphin-emu/sys: usr/local/bin/Sys
     after:
       - patches
-      # - desktop-packages
       - desktop-qt5
   desktop-qt5:
     build-packages:
@@ -130,20 +128,6 @@ parts:
       snapcraftctl prime
       sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
       sed -i 's|XDG_CONFIG_HOME=$SNAP_USER_DATA|XDG_CONFIG_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
-  # desktop-packages:
-  #   plugin: nil
-  #   stage-packages:
-  #     - libgdk-pixbuf2.0-0
-  #     - adwaita-icon-theme
-  #     - gnome-themes-standard
-  #     - shared-mime-info
-  #     - libxkbcommon0
-  #     - ttf-ubuntu-font-family
-  #     - dmz-cursor-theme
-  #     - light-themes
-  #     - locales-all
-  #     - xdg-user-dirs
-  #     - libgtk2.0-0
   patches:
     plugin: dump
     source: snap/local/patches
@@ -156,26 +140,6 @@ parts:
     source-type: local
     organize:
       '*': bin/
-  # This part removes all the files in this snap which already exist in
-  # connected content and base snaps. Since these files will be available
-  # at runtime from the content and base snaps, they do not need to be
-  # included in this snap itself.
-  #
-  # More info: https://snapcraft-utils-library.readthedocs.io/en/latest/lib/cleanup.html 
-  # #
-  # cleanup:
-  #   after:  # Make this part run last; list all your other parts here
-  #     - dolphin-emu
-  #     - patches
-  #     - desktop-packages
-  #   plugin: nil
-  #   build-snaps:  # List all content-snaps and base snaps you're using here
-  #     - core18
-  #   override-prime: |
-  #     set -eux
-  #     for snap in "core18"; do  # List all content-snaps and base snaps you're using here
-  #       cd "/snap/$snap/current" && find . -type f -exec rm -f "$SNAPCRAFT_PRIME/{}" \;
-  #     done
 
 layout:
     /usr/local/lib/$SNAPCRAFT_ARCH_TRIPLET/perl/5.26.1:
@@ -202,12 +166,14 @@ plugs:
     interface: content
     target: $SNAP/data-dir/sounds
     default-provider: gtk-common-themes
+  shmem:
+    interface: shared-memory
+    private: true
 
 apps:
   dolphin-emu:
     command: usr/local/bin/dolphin-emu
     command-chain:
-      # - bin/dolphin-launch
       - bin/desktop-launch
     desktop: usr/local/share/applications/dolphin-emu.desktop
     environment:
@@ -233,6 +199,7 @@ apps:
       - bluez
       - optical-drive
       - raw-usb
+      - shmem
   dolphin-emu-nogui:
     command: usr/local/bin/dolphin-emu-nogui
     environment:
@@ -255,4 +222,5 @@ apps:
       - bluez
       - optical-drive
       - raw-usb
+      - shmem
 

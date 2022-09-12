@@ -24,14 +24,15 @@ jobs:
       with:
         token: ${{ secrets.PAT }}
         ref: ${{ github.event.inputs.channel }}
-    - uses: snapcore/action-build@v1
+    - uses: snapcore/action-build@v1.1.0
       id: snapcraft
-    - name: Testing snap
-      run: |
-        sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
-        snap run dolphin-emulator.dolphin-emu --version
-    - uses: snapcore/action-publish@v1
+    # - name: Testing snap
+    #   run: |
+    #     sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
+    #     snap run dolphin-emulator.dolphin-emu --version
+    - uses: snapcore/action-publish@v1.1.1
+      env:
+        SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
       with:
-        store_login: ${{ secrets.STORE_LOGIN }}
         snap: ${{ steps.snapcraft.outputs.snap }}
         release: ${{ github.event.inputs.channel }}
