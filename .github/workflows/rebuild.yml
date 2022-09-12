@@ -19,6 +19,7 @@ jobs:
       if: ${{ github.event.inputs.channel }} == 'stable'
       with:
         token: ${{ secrets.PAT }}
+        ref: master
     - uses: actions/checkout@v2
       if: ${{ github.event.inputs.channel }} != 'stable'
       with:
