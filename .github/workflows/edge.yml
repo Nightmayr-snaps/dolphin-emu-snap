@@ -18,6 +18,7 @@ jobs:
         token: ${{ secrets.PAT }}
     - name: Install python3 and pip modules
       run: |
+        sudo apt install gcc -y
         sudo apt install python3 -y
         sudo apt install python3-pip -y
         sudo apt install python3-setuptools -y
